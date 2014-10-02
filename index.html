@@ -10,15 +10,35 @@
     
 </head>
 <body ng-controller="PowerController as pwrCtrl">
-        <button class="btn btn-danger" ng-click="pwrCtrl.testButton()">Action Button</button>
+
+
+        <center><img src="logo.png" width="200px"></center>
 
     <div class="container">
     <linechart data="pwrCtrl.plotData" options="pwrCtrl.plotOptions"></linechart>
     </div>
 <div class="card">
+<div class="container">
+<div class="list-group">
+  <a href="#" class="list-group-item active">
+    <h4 class="list-group-item-heading">Total Usage</h4>
+    <p class="list-group-item-text"><h1 style="color: white;">{{pwrCtrl.totalUsage}}<div class="badge">khw</div></h1></p>
+  </a>
+  <a href="#" class="list-group-item active">
+    <h4 class="list-group-item-heading">Current Usage</h4>
+    <p class="list-group-item-text"><h1 style="color: white;">{{pwrCtrl.currentUsage}}<div class="badge">khw</div></h1></p>
+  </a>
+  <a href="#" class="list-group-item active">
+    <h4 class="list-group-item-heading">Last 24 Hour</h4>
+    <p class="list-group-item-text"><h1 style="color: white;">{{pwrCtrl.last24Hour}}<div class="badge">khw</div></h1></p>
+  </a>
+</div>
+</div>
+
 
 </div>
 
+<div class="container">
 <div class="card">
   <div class="item item-divider">
       <div class="badge">{{pwrCtrl.currentUsage}}</div>
@@ -28,11 +48,14 @@
         <div class="badge">{{pwrCtrl.lastRunningHour}}</div>
     Last running hour
   </div>
-  <div class="item item-divider">
-    I'm a Footer in a Card!
+  
+    <div class="item item-text-wrap">
+        <div class="badge">{{pwrCtrl.baseLine}}</div>
+    Baseline
   </div>
+
 </div>
-  <div class="tabs-striped tabs-background-positive tabs-light">
+<!--  <div class="tabs-striped tabs-background-positive tabs-light">
     <div class="tabs">
       <a class="tab-item active" href="#">
         <i class="icon ion-home"></i>
@@ -47,7 +70,7 @@
         Settings
       </a>
     </div>
-  </div>
+  </div>-->
 </body>
 
 <script type="text/javascript" charset="utf-8" src="//code.jquery.com/jquery-2.1.1.js"></script>
