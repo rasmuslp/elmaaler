@@ -1,0 +1,67 @@
+<html ng-app="awareApp">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="//code.ionicframework.com/1.0.0-beta.13/css/ionic.min.css">
+    <link rel="stylesheet" href="style.css" />
+    
+</head>
+<body ng-controller="PowerController as pwrCtrl">
+        <button class="btn btn-danger" ng-click="pwrCtrl.testButton()">Action Button</button>
+
+    <div class="container">
+    <linechart data="pwrCtrl.plotData" options="pwrCtrl.plotOptions"></linechart>
+    </div>
+<div class="card">
+
+</div>
+
+<div class="card">
+  <div class="item item-divider">
+      <div class="badge">{{pwrCtrl.currentUsage}}</div>
+       Current Usage
+  </div>
+  <div class="item item-text-wrap">
+        <div class="badge">{{pwrCtrl.lastRunningHour}}</div>
+    Last running hour
+  </div>
+  <div class="item item-divider">
+    I'm a Footer in a Card!
+  </div>
+</div>
+  <div class="tabs-striped tabs-background-positive tabs-light">
+    <div class="tabs">
+      <a class="tab-item active" href="#">
+        <i class="icon ion-home"></i>
+        Test
+      </a>
+      <a class="tab-item" href="#">
+        <i class="icon ion-star"></i>
+        Favorites
+      </a>
+      <a class="tab-item" href="#">
+        <i class="icon ion-gear-a"></i>
+        Settings
+      </a>
+    </div>
+  </div>
+</body>
+
+<script type="text/javascript" charset="utf-8" src="//code.jquery.com/jquery-2.1.1.js"></script>
+<script type="text/javascript" charset="utf-8" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.js"></script>
+<script type="text/javascript" charset="utf-8" src="//code.angularjs.org/1.2.25/angular.js"></script>
+<script type="text/javascript" charset="utf-8" src="//code.angularjs.org/1.2.25/angular-route.js"></script>
+<script type="text/javascript" charset="utf-8" src="//code.angularjs.org/1.2.25/angular-animate.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdn.firebase.com/libs/angularfire/0.8.2/angularfire.js"></script>
+<script type="text/javascript" charset="utf-8" src="//code.ionicframework.com/1.0.0-beta.13/js/ionic.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://d3js.org/d3.v3.min.js"></script>
+
+<script type="text/javascript" charset="utf-8" src="js/line-chart.js"></script>
+
+<script type="text/javascript" charset="utf-8" src="app.js"></script>
+
+</html>
