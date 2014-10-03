@@ -1,0 +1,22 @@
+.container {
+}
+
+body {
+    background-color:#f2f2f2;
+}
+
+.jumbotron {
+    background-color:#00ada7;
+}
+
+.statsRow {
+    background-color:#00ada7;
+}
+
+.specialz {
+    background-color:#c8c8c8;
+}
+
+.chart {
+    height:400px;
+}

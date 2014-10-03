@@ -17,7 +17,13 @@
    awareApp.controller('PowerController', ['IncommingDataRepository',
       function(IncommingDataRepository) {
          this.data = IncommingDataRepository.get();
+         
+         // Load complete, show page
+         $('#splash').fadeOut();
+         
+         this.currentPrice = 2.2;
          this.currentUsage = 'Collecting data...';
+         this.totalUsage = 0;
          this.plotData = [];
          this.plotOptions = {
             axes: {
@@ -35,7 +41,7 @@
             },
             series: [{
                y: 'usage',
-               color: 'steelblue',
+               color: 'grey',
                thickness: '1px',
                type: 'area',
                label: 'Watt'
@@ -45,7 +51,7 @@
             tooltip: {
                mode: 'scrubber',
                formatter: function(x, y, series) {
-                  return y + ' W\n' + y + ' s';
+                  return y + ' W at ' + x + ' s';
                }
             },
             drawLegend: true,
@@ -62,14 +68,13 @@
             if (event.event === 'child_added') {
                // New data
                self.data.$getRecord(event.key).verified = false;
+               self.totalUsage++;
 
                if (event.prevChild === null) {
                   return;
                }
 
-               // if (self.data.length < 4) {
-               //    return;
-               // }
+               
 
                var current = self.data.$getRecord(event.key);
                var prev = self.data.$getRecord(event.prevChild);
@@ -116,29 +121,37 @@
             }
          });
          
-         this.addDataToPlot = function(dataPoint, usage) {
-            if (this.plotTimeZero === 'undefined') {
-                  this.plotTimeZero = dataPoint.timeStamp;
-               }
-
-               this.currentUsage = usage;
-
-               this.plotData.push({
-                  x: Math.round((dataPoint.timeStamp - this.plotTimeZero) / 1000),
-                  usage: usage
-               });
-         };
-
          this.calculateUsage = function(prev, current) {
             var time = prev.timeStamp - current.timeStamp;
             time = time / 1000.0;
             return Math.round(3600 / time);
          };
+         
+         this.addDataToPlot = function(dataPoint, usage) {
+            // Add to plot data
+            if (this.plotTimeZero === 'undefined') {
+               this.plotTimeZero = dataPoint.timeStamp;
+            }
 
-         this.testButton = function() {
+            this.currentUsage = usage;
 
-            console.log(this.plotData);
+            this.plotData.push({
+               x: Math.round((dataPoint.timeStamp - this.plotTimeZero) / 1000),
+               usage: usage
+            });
+            
+            // // Add to total usage
+            // if (typeof this.totalUsage === 'string') {
+            //    this.totalUsage = 0;
+            // }
+            
+            // // Hax calculation comming rigth up !
+            // if (this.plotData.length > 1) {
+            //    var time = this.plotData[this.plotData.length-1].x - this.plotData[this.plotData.length-2].x
+            //    this.totalUsage += usage / time;
+            // }
          };
+         
       }
    ]);
 
