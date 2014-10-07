@@ -3,42 +3,6 @@
 (function() {
    var awareApp = angular.module('awareApp', ['firebase', 'n3-line-chart']);
 
-   awareApp.filter('plotRange', function() {
-      return function(input, minutes) {
-         input = input || [];
-         if (input.length === 0) {
-            return false;
-         }
-
-         minutes = minutes || 0;
-         if (minutes === 0) {
-            return input;
-         }
-
-         //var startTime = new Date().getTime();
-
-         minutes = parseInt(minutes);
-         var ret = [];
-
-         var newestTime = input[input.length - 1].x;
-         var timeDiff = minutes * 60;
-         for (var i = input.length - 1; i >= 0; i--) {
-            if (input[i].x > newestTime - timeDiff) {
-               ret.push(input[i]);
-            }
-            else {
-               break;
-            }
-         }
-
-         ret.reverse();
-
-         //console.log('Filter took: ' + (new Date().getTime() - startTime) + ' ms');
-
-         return ret;
-      };
-   });
-
    awareApp.factory('DataMetaRepository', function($firebase) {
       var ref = new Firebase("https://elmaaler.firebaseio.com/dataMeta");
       var data = $firebase(ref).$asArray();
@@ -70,12 +34,29 @@
       function($firebase, DataMetaRepository, DataRepository) {
          console.log('Aware starting');
          var self = this;
-
-         //TODO: Move
-         this.plotMinutes = 30;
-
+         
+         // For the correction algo in the $watch
+         var unverfiedUsage = false;
          this.correctorEnabled = false;
+         
          this.currentPrice = 2.2;
+         
+         this.dataMeta = DataMetaRepository.get();
+         // Initialse data
+         this.dataMeta.$loaded().then(function(dataMeta) {
+            self.dataMeta.unshift({
+               data_id: 'incoming',
+               title: 'Live'
+            });
+
+            self.selectedDataset = self.dataMeta[0];
+            self.changeDataset();
+            self.setPlotTime(30);
+            
+            // Load complete, show page
+            $('#splash').fadeOut();
+         });
+         
          this.plotOptions = {
             axes: {
                x: {
@@ -92,7 +73,7 @@
             },
             series: [{
                y: 'usage',
-               color: '#00ada7',
+               color: '#9dbc8b',
                thickness: '1px',
                type: 'area',
                label: 'Watt'
@@ -109,15 +90,23 @@
             drawDots: false,
             columnsHGap: 5
          };
-
-         this.dataMeta = DataMetaRepository.get();
-         this.dataMeta.$loaded().then(function(dataMeta) {
-            // Load complete, show page
-            $('#splash').fadeOut();
-         });
-
-         // For the correction algo in the $watch
-         var unverfiedUsage = false;
+         
+         this.setPlotTime = function(minutes) {
+            minutes = parseInt(minutes || 0);
+            var oldMinutes = this.plotMinutes || 0;
+            if (minutes === oldMinutes) {
+               return;
+            }
+            this.plotMinutes = minutes;
+            
+            if ((minutes > oldMinutes && oldMinutes !== 0) || minutes === 0) {
+               // Need to add data, reset to solve this
+               this.changeDataset();
+            }
+            
+            // Trim what is needed
+            this.trimPlotToInterval();
+         }
 
          this.changeDataset = function() {
             if (typeof this.data !== 'undefined') {
@@ -182,17 +171,6 @@
             });
          };
 
-         // Initialse data
-         this.dataMeta.$loaded().then(function(dataMeta) {
-            self.dataMeta.unshift({
-               data_id: 'incoming',
-               title: 'Live'
-            });
-
-            self.selectedDataset = self.dataMeta[0];
-            self.changeDataset();
-         });
-
          this.calculateUsage = function(prev, current) {
             var time = prev.timeStamp - current.timeStamp;
             time = time / 1000.0;
@@ -211,6 +189,27 @@
                x: Math.round((dataPoint.timeStamp - this.plotTimeZero) / 1000),
                usage: usage
             });
+            
+            this.trimPlotToInterval();
+         };
+         
+         this.trimPlotToInterval = function() {
+            if (this.plotMinutes === 0 || this.plotData.length === 0) {
+               // No triming
+               return;
+            }
+            
+            var newestTime = this.plotData[this.plotData.length - 1].x;
+            var timeDiff = this.plotMinutes * 60;
+            for (var i = 0; i < this.plotData.length - 1; i++) {
+               if (this.plotData[i].x < newestTime - timeDiff) {
+                  this.plotData.shift();
+                  i--;
+               }
+               else {
+                  break;
+               }
+            }
          };
 
          this.saveDataset = function() {

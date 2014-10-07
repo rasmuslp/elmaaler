@@ -13,8 +13,7 @@ body {
 }
 
 .logoTron {
-    background-color:#00ada7;
-    box-shadow: 0px 1px 0px #888888;
+    background-color: #9dbc8b;
     margin-bottom: 0px;
 }
 
@@ -34,35 +33,37 @@ body {
 
 .tabContainer {
 	color: white;
-	background-color: #00ada7;
 	padding: 40px;
 	width: 100%;
 }
 
+
 .text {
 	width: 700px;
+	transition: all 0.4s ease;
+	
 }
 
 .btn-tab {
-	background: #00ada7;
-	color: #fff;
-	background-color: #00ada7;	
+	background-color: #9dbc8b;	
 	-webkit-border-radius: 0px;
 	-moz-border-radius: 0px;
 	border-radius: 0px;
 }
 
 .btn-tab:hover{
-	color: #00ada7;
-	transition: all 0.4s ease;
+	color: #9dbc8b;
 	background-color: #fff;
+	transition: all 0.4s ease;
+	
 }
 
 
 .btn-tab.selected{
 	font-weight: bold;
 	background-color: #fff;
-	color: #00ada7;
+	color: #9dbc8b;
+	
 }
 
 .logo {
@@ -71,7 +72,8 @@ body {
 }
 
 .tabTron {
-	background-color: white;
+	background-color: #9dbc8b;
+	margin-top: 1px;
 }
 
 .logo .sticky {
@@ -84,7 +86,7 @@ body {
 }
 
 .statsRow h4{
-	color: #00ada7;
+	color: #9dbc8b;
 }
 
 .statsRow h3{
@@ -92,7 +94,7 @@ body {
 }
 
 .footer {
-    background-color: #2e2e2e;
+    background-color: #dddddd;
 }
 
 svg {
@@ -114,24 +116,24 @@ linechart {
 
 .btn-chart {
 	background-color: #f2f2f2;
-	color: #00ada7;
+	color: #9dbc8b;
 	margin-bottom: 20px;
     transition: all 0.4s ease;
-    border: 1px solid #00ada7;
+    border: 1px solid #9dbc8b;
 }
 
 .btn-chart:hover {
 	background-color: white;
-	color: #00ada7;
+	color: #9dbc8b;
 }
 
 .btn-chart.selected {
-	background-color: #00ada7;
+	background-color:#9dbc8b;
 	color: #f2f2f2;
 }
 
 .panel-body h5{
-	color: #00ada7;
+	color: #9dbc8b;
 }
 
 .panel-default > .panel-heading {

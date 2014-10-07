@@ -18,7 +18,7 @@
       background-repeat: no-repeat;
       background-attachment: fixed;
       background-position: center;
-      background-color: #00ada7;
+      background-color: #9dbc8b;
       z-index: 10;
       text-align: center;
     }
@@ -47,49 +47,28 @@
     <center>
       <div class="tabContainer">
         <div class="btn-group tabButtons">
-          <button type="button" class="btn btn-tab">Why be aware?</button>
-          <button type="button" class="btn btn-tab">About</button>
-          <button type="button" class="btn btn-tab selected">Product</button>
+          <button type="button" class="btn btn-tab" ng-click="tab = 1" ng-class="{selected:tab === 1}">Why be aware?</button>
+          <button type="button" class="btn btn-tab" ng-click="tab = 2" ng-class="{selected:tab === 2}">About</button>
+          <button type="button" class="btn btn-tab" ng-click="tab = 3" ng-class="{selected:tab === 3}" >Product</button>
         </div>
-        <hr>
-        <div class="text">
+        <div class="text" ng-init="tab=1">
+                <hr>
+
+          <div class="tab-content" ng-show="tab === 1">
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
           in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+          </div>
+          
+          <div class="tab-content" ng-show="tab === 2">
+          Nummer 2
+          </div>
+          <div class="tab-content" ng-show="tab === 3">
+          Tab 3
+          </div>
         </div>
+
       </div>
     </center>
-  </div>
-
-  <div class="container fluid">
-    <div class="chart">
-      <linechart class="chart" data="pwrCtrl.plotData | plotRange:pwrCtrl.plotMinutes" options="pwrCtrl.plotOptions"></linechart>
-    </div>
-    <!--<div class="chart"><linechart class="chart" data="pwrCtrl.plotData | limitTo:-1000" options="pwrCtrl.plotOptions"></linechart></div>-->
-    <center>
-      <div class="btn-group chartButtons">
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.plotMinutes = 0">All Data</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.plotMinutes = 1440">Last 24 hours</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.plotMinutes = 60">Last hour</button>
-        <button type="button" class="btn btn-chart selected" ng-click="pwrCtrl.plotMinutes = 30">Last 30 minutes</button>
-      </div>
-    </center>
-    <!--<div range-slider="range-slider" min="1000" max="10000" model-min="1000" model-max="10000">-->
-  </div>
-
-  <div class="panel panel-default adminPanel">
-    <div class="panel-heading aware-heading">Admin panel</div>
-    <div class="panel-body">
-      <div class="form-group">
-        <input class="form form-control" ng-model="pwrCtrl.newDataset.title">
-      </div>
-      <button ng-click="pwrCtrl.saveDataset()" class="btn btn-default">Save dataset</button>
-      <hr>
-      <h5>Select dataset:</h5>
-      <select ng-model="pwrCtrl.selectedDataset" ng-change="pwrCtrl.changeDataset()" class="form-control" ng-options="dataMeta.title for dataMeta in pwrCtrl.dataMeta">
-      </select>
-      <br/>
-
-    </div>
   </div>
 
   <div class="jumbotron footer">
@@ -112,6 +91,39 @@
       </div>
     </div>
   </div>
+
+  <div class="container fluid">
+      <center>
+      <div class="btn-group chartButtons" ng-init="range = 4">
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(0); range = 1" ng-class="{selected:range === 1}">All Data</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2"  ng-class="{selected:range === 2}">Last 24 hours</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3"  ng-class="{selected:range === 3}">Last hour</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4"  ng-class="{selected:range === 4}">Last 30 minutes</button>
+      </div>
+    </center>
+    <div class="chart">
+      <linechart class="chart" data="pwrCtrl.plotData" options="pwrCtrl.plotOptions"></linechart>
+    </div>
+    <!--<div range-slider="range-slider" min="1000" max="10000" model-min="1000" model-max="10000">-->
+  </div>
+
+  <div class="panel panel-default adminPanel">
+    <div class="panel-heading aware-heading">Admin panel</div>
+    <div class="panel-body">
+      <div class="form-group">
+        <input class="form form-control" ng-model="pwrCtrl.newDataset.title">
+      </div>
+      <button ng-click="pwrCtrl.saveDataset()" class="btn btn-default">Save dataset</button>
+      <hr>
+      <h5>Select dataset:</h5>
+      <select ng-model="pwrCtrl.selectedDataset" ng-change="pwrCtrl.changeDataset()" class="form-control" ng-options="dataMeta.title for dataMeta in pwrCtrl.dataMeta">
+      </select>
+      <br/>
+
+    </div>
+  </div>
+
+  
   <!--  <div class="tabs-striped tabs-background-positive tabs-light">
     <div class="tabs">
       <a class="tab-item active" href="#">
