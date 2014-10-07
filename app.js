@@ -3,12 +3,39 @@
 (function() {
    var awareApp = angular.module('awareApp', ['firebase', 'n3-line-chart']);
 
-   awareApp.filter('range', function() {
-      return function(input, total) {
-         total = parseInt(total);
-         for (var i = 0; i < total; i++)
-            input.push(i);
-         return input;
+   awareApp.filter('plotRange', function() {
+      return function(input, minutes) {
+         input = input || [];
+         if (input.length === 0) {
+            return false;
+         }
+
+         minutes = minutes || 0;
+         if (minutes === 0) {
+            return input;
+         }
+
+         //var startTime = new Date().getTime();
+
+         minutes = parseInt(minutes);
+         var ret = [];
+
+         var newestTime = input[input.length - 1].x;
+         var timeDiff = minutes * 60;
+         for (var i = input.length - 1; i >= 0; i--) {
+            if (input[i].x > newestTime - timeDiff) {
+               ret.push(input[i]);
+            }
+            else {
+               break;
+            }
+         }
+
+         ret.reverse();
+
+         //console.log('Filter took: ' + (new Date().getTime() - startTime) + ' ms');
+
+         return ret;
       };
    });
 
@@ -44,13 +71,14 @@
          console.log('Aware starting');
          var self = this;
 
+         //TODO: Move
+         this.plotMinutes = 30;
+
          this.correctorEnabled = false;
          this.currentPrice = 2.2;
          this.plotOptions = {
             axes: {
                x: {
-                  min: 0,
-                  max: 200,
                   labelFunction: function(value) {
                      return value + ' s';
                   }
@@ -77,13 +105,13 @@
                   return y + ' W at ' + x + ' s';
                }
             },
-            drawLegend: true,
+            drawLegend: false,
             drawDots: false,
             columnsHGap: 5
          };
 
          this.dataMeta = DataMetaRepository.get();
-         this.dataMeta.$loaded().then(function(dataMeta){
+         this.dataMeta.$loaded().then(function(dataMeta) {
             // Load complete, show page
             $('#splash').fadeOut();
          });

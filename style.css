@@ -1,5 +1,6 @@
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
 
+
 .container {
 }
 
@@ -11,9 +12,10 @@ body {
     background-color:#f2f2f2;
 }
 
-.jumbotron {
+.logoTron {
     background-color:#00ada7;
     box-shadow: 0px 1px 0px #888888;
+    margin-bottom: 0px;
 }
 
 .adminPanel {
@@ -23,15 +25,53 @@ body {
 	top: 10px;
 	left: 10px;
 	display: block;
+	display: none;
 }
 
 #splash {
     z-index:999;
 }
 
+.tabContainer {
+	color: white;
+	background-color: #00ada7;
+	padding: 40px;
+	width: 100%;
+}
+
+.text {
+	width: 700px;
+}
+
+.btn-tab {
+	background: #00ada7;
+	color: #fff;
+	background-color: #00ada7;	
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+}
+
+.btn-tab:hover{
+	color: #00ada7;
+	transition: all 0.4s ease;
+	background-color: #fff;
+}
+
+
+.btn-tab.selected{
+	font-weight: bold;
+	background-color: #fff;
+	color: #00ada7;
+}
+
 .logo {
     width:200px;
     transition: all 0.4s ease;
+}
+
+.tabTron {
+	background-color: white;
 }
 
 .logo .sticky {
@@ -51,12 +91,8 @@ body {
 	color: gray;
 }
 
-.specialz {
+.footer {
     background-color: #2e2e2e;
-    position: fixed;
-    bottom: 0;
-    margin-top: 10px;
-    width: 100%;
 }
 
 svg {
