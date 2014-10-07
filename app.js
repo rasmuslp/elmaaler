@@ -3,51 +3,74 @@
 (function() {
    var awareApp = angular.module('awareApp', ['firebase', 'n3-line-chart']);
 
-   awareApp.factory('IncommingDataRepository', function($firebase) {
-      var ref = new Firebase("https://elmaaler.firebaseio.com/01/data");
-      var sync = $firebase(ref);
-      var data = sync.$asArray();
+   awareApp.filter('range', function() {
+      return function(input, total) {
+         total = parseInt(total);
+         for (var i = 0; i < total; i++)
+            input.push(i);
+         return input;
+      };
+   });
+
+   awareApp.factory('DataMetaRepository', function($firebase) {
+      var ref = new Firebase("https://elmaaler.firebaseio.com/dataMeta");
+      var data = $firebase(ref).$asArray();
       return {
          get: function() {
             return data;
          }
-      };
+      }
    });
 
-   awareApp.controller('PowerController', ['IncommingDataRepository',
-      function(IncommingDataRepository) {
-         this.data = IncommingDataRepository.get();
-         
-         // Load complete, show page
-         $('#splash').fadeOut();
-         
+   awareApp.factory('DataRepository', function($firebase) {
+      var data;
+
+      var DataRepository = {};
+      DataRepository.setup = function(key) {
+         data = $firebase(new Firebase("https://elmaaler.firebaseio.com/data/" + key + '/raw')).$asArray();
+      };
+      DataRepository.data = function() {
+         return data;
+      };
+      DataRepository.destroy = function() {
+         data.$destroy();
+      };
+
+      return DataRepository;
+   });
+
+   awareApp.controller('PowerController', ['$firebase', 'DataMetaRepository', 'DataRepository',
+      function($firebase, DataMetaRepository, DataRepository) {
+         console.log('Aware starting');
+         var self = this;
+
+         this.correctorEnabled = false;
          this.currentPrice = 2.2;
-         this.currentUsage = 'Collecting data...';
-         this.totalUsage = 0;
-         this.plotData = [];
          this.plotOptions = {
             axes: {
-              x: {
-                 labelFunction: function(value) {
-                    return value + ' s';
-                 }
-              },
-              y: {
-                 min: 0,
-                 labelFunction: function(value) {
-                    return value + ' W'
-                 }
-              }
+               x: {
+                  min: 0,
+                  max: 200,
+                  labelFunction: function(value) {
+                     return value + ' s';
+                  }
+               },
+               y: {
+                  min: 0,
+                  labelFunction: function(value) {
+                     return value + ' W'
+                  }
+               }
             },
             series: [{
                y: 'usage',
-               color: 'grey',
+               color: '#00ada7',
                thickness: '1px',
                type: 'area',
                label: 'Watt'
             }],
-            lineMode: 'linear',
-            tension: 0.7,
+            lineMode: 'step-after',
+            tension: 2.7,
             tooltip: {
                mode: 'scrubber',
                formatter: function(x, y, series) {
@@ -59,74 +82,95 @@
             columnsHGap: 5
          };
 
-         this.plotTimeZero = 'undefined';
+         this.dataMeta = DataMetaRepository.get();
+         this.dataMeta.$loaded().then(function(dataMeta){
+            // Load complete, show page
+            $('#splash').fadeOut();
+         });
 
-         var self = this;
+         // For the correction algo in the $watch
          var unverfiedUsage = false;
 
-         this.data.$watch(function(event) {
-            if (event.event === 'child_added') {
-               // New data
-               self.data.$getRecord(event.key).verified = false;
-               self.totalUsage++;
+         this.changeDataset = function() {
+            if (typeof this.data !== 'undefined') {
+               DataRepository.destroy();
+            }
 
-               if (event.prevChild === null) {
-                  return;
-               }
+            this.currentUsage = 'Collecting data...';
+            this.totalUsage = 0;
+            this.plotTimeZero = 'undefined';
+            this.plotData = [];
 
-               
-
-               var current = self.data.$getRecord(event.key);
-               var prev = self.data.$getRecord(event.prevChild);
-               var usage = self.calculateUsage(current, prev);
-
-               if (self.unverfiedUsage) {
-                  // Comparison of current usage vs last unverified usage
-                  
-                  //var lastUsage = self.unverfiedUsage;
-                  var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
-                  var diff = Math.abs(usage - lastVerifiedUsage);
-                  if (diff > 0.05* lastVerifiedUsage) {
-                     console.log('Alright, load must have changed');
-                     self.addDataToPlot(prev, self.unverfiedUsage);
-                  } else {
-                     console.log('Correcting data');
-                     self.addDataToPlot(prev, usage);
+            DataRepository.setup(this.selectedDataset.data_id);
+            this.data = DataRepository.data();
+            this.data.$watch(function(event) {
+               if (event.event === 'child_added') {
+                  // New data
+                  self.data.$getRecord(event.key).verified = false;
+                  self.totalUsage++;
+                  if (event.prevChild === null) {
+                     return;
                   }
-                  
-                  self.unverfiedUsage = false;
-               } else {
-                  //??
 
-                  if (self.plotData.length > 1) {
-                     // Comparison of current usage vs last verified usage
-                     var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
-                     var diff = Math.abs(usage - lastVerifiedUsage);
-                     if (diff > 0.05* lastVerifiedUsage) {
-                        // Max 10% diff filter
-                        console.log('Diff to big, not verified');
-                        self.unverfiedUsage = usage;
-                        return;
+                  var current = self.data.$getRecord(event.key);
+                  var prev = self.data.$getRecord(event.prevChild);
+                  var usage = self.calculateUsage(current, prev);
+
+                  if (self.correctorEnabled) {
+
+                     if (self.unverfiedUsage) {
+                        // Comparison of current usage vs last unverified usage
+
+                        var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
+                        var diff = Math.abs(usage - lastVerifiedUsage);
+                        if (diff > 0.05 * lastVerifiedUsage) {
+                           console.log('Alright, load must have changed');
+                           self.addDataToPlot(prev, self.unverfiedUsage);
+                        }
+                        else {
+                           console.log('Correcting data');
+                           self.addDataToPlot(prev, usage);
+                        }
+
+                        self.unverfiedUsage = false;
+                     }
+                     else {
+                        if (self.plotData.length > 1) {
+                           // Comparison of current usage vs last verified usage
+                           var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
+                           var diff = Math.abs(usage - lastVerifiedUsage);
+                           if (diff > 0.05 * lastVerifiedUsage) {
+                              // Max 10% diff filter
+                              console.log('Diff to big, not verified');
+                              self.unverfiedUsage = usage;
+                              return;
+                           }
+                        }
                      }
                   }
-                  
-                  //??
-               }
 
-               // var currentM2 = self.data.$getRecord(self.data.$keyAt(self.data.$indexFor(event.prevChild)-1));
-               // var currentM3 = self.data.$getRecord(self.data.$keyAt(self.data.$indexFor(event.prevChild)-2));
-               //var usageM2 = self.calculateUsage(currentM2, currentM3);
-               
-               self.addDataToPlot(current, usage);
-            }
+                  self.addDataToPlot(current, usage);
+               }
+            });
+         };
+
+         // Initialse data
+         this.dataMeta.$loaded().then(function(dataMeta) {
+            self.dataMeta.unshift({
+               data_id: 'incoming',
+               title: 'Live'
+            });
+
+            self.selectedDataset = self.dataMeta[0];
+            self.changeDataset();
          });
-         
+
          this.calculateUsage = function(prev, current) {
             var time = prev.timeStamp - current.timeStamp;
             time = time / 1000.0;
             return Math.round(3600 / time);
          };
-         
+
          this.addDataToPlot = function(dataPoint, usage) {
             // Add to plot data
             if (this.plotTimeZero === 'undefined') {
@@ -139,19 +183,38 @@
                x: Math.round((dataPoint.timeStamp - this.plotTimeZero) / 1000),
                usage: usage
             });
-            
-            // // Add to total usage
-            // if (typeof this.totalUsage === 'string') {
-            //    this.totalUsage = 0;
-            // }
-            
-            // // Hax calculation comming rigth up !
-            // if (this.plotData.length > 1) {
-            //    var time = this.plotData[this.plotData.length-1].x - this.plotData[this.plotData.length-2].x
-            //    this.totalUsage += usage / time;
-            // }
          };
-         
+
+         this.saveDataset = function() {
+            var self = this;
+
+            // Copy incoming data
+            var currentData = [];
+            angular.forEach(this.data, function(rawDataPoint) {
+               this.push({
+                  timeStamp: rawDataPoint.timeStamp
+               });
+            }, currentData);
+
+            // Remove incoming data
+            $firebase(new Firebase("https://elmaaler.firebaseio.com/data/incoming")).$remove();
+
+            // Save current data
+            $firebase(new Firebase("https://elmaaler.firebaseio.com/data/")).$push({
+               raw: currentData
+            }).then(function(data_ref) {
+               self.dataMeta.$add({
+                  title: self.newDataset.title,
+                  data_id: data_ref.name()
+               }).then(function(data_meta_ref) {
+                  self.selectedDataset = self.dataMeta.$getRecord(data_meta_ref.name());
+                  self.changeDataset();
+               })
+               self.newDataset.title = '';
+
+            });
+         };
+
       }
    ]);
 
