@@ -18,7 +18,7 @@
       background-repeat: no-repeat;
       background-attachment: fixed;
       background-position: center;
-      background-color: #9dbc8b;
+      background-color: #6ad1e6;
       z-index: 10;
       text-align: center;
     }
@@ -59,7 +59,7 @@
           in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
           </div>
           
-          <div class="tab-content" ng-show="tab === 2">
+          <div class="tab-content" ng-show="tab === 2" ng-animate="animate">
           Nummer 2
           </div>
           <div class="tab-content" ng-show="tab === 3">
@@ -71,7 +71,7 @@
     </center>
   </div>
 
-  <div class="jumbotron footer">
+  <div class="jumbotron statsTron">
     <div class="container">
       <div class="row">
         <div class="card col-sm-4 statsRow">
@@ -84,7 +84,22 @@
           <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 | number: 3}}<br /><small> kWh</small></h3>
         </div>
 
-        <div class="card col-sm-4 statsRow round">
+        <div class="card col-sm-4 statsRow">
+          <h4 class="text-center">Total Price</h4>
+          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="card col-sm-4 statsRow">
+          <h4 class="text-center">Total Price</h4>
+          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
+        </div>
+                <div class="card col-sm-4 statsRow">
+          <h4 class="text-center">Total Price</h4>
+          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
+        </div>
+                <div class="card col-sm-4 statsRow">
           <h4 class="text-center">Total Price</h4>
           <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
         </div>
@@ -99,6 +114,8 @@
         <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2"  ng-class="{selected:range === 2}">Last 24 hours</button>
         <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3"  ng-class="{selected:range === 3}">Last hour</button>
         <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4"  ng-class="{selected:range === 4}">Last 30 minutes</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(5); range = 5"  ng-class="{selected:range === 5}">Last 5 minutes</button>
+
       </div>
     </center>
     <div class="chart">
@@ -123,6 +140,27 @@
     </div>
   </div>
 
+<div class="jumbotron footer">
+    <div class="container">
+      <div class="row">
+        <div class="card col-sm-4">
+          <h4 class="text-center">Current Usage</h4>
+          <h3 class="text-center">{{pwrCtrl.currentUsage}}<br /><small> Watt</small></h3>
+        </div>
+
+        <div class="card col-sm-4">
+          <h4 class="text-center">Total Usage</h4>
+          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 | number: 3}}<br /><small> kWh</small></h3>
+        </div>
+
+        <div class="card col-sm-4">
+          <h2>
+            This is how old we are:
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
   
   <!--  <div class="tabs-striped tabs-background-positive tabs-light">
     <div class="tabs">

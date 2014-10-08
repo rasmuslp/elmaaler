@@ -1,6 +1,5 @@
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
 
-
 .container {
 }
 
@@ -9,11 +8,11 @@ html {
 }
 
 body {
-    background-color:#f2f2f2;
+    background-color:#white;
 }
 
 .logoTron {
-    background-color: #9dbc8b;
+    background-color: #6ad1e6;
     margin-bottom: 0px;
 }
 
@@ -45,14 +44,14 @@ body {
 }
 
 .btn-tab {
-	background-color: #9dbc8b;	
+	background-color: #6ad1e6;	
 	-webkit-border-radius: 0px;
 	-moz-border-radius: 0px;
 	border-radius: 0px;
 }
 
 .btn-tab:hover{
-	color: #9dbc8b;
+	color: #6ad1e6;
 	background-color: #fff;
 	transition: all 0.4s ease;
 	
@@ -62,7 +61,7 @@ body {
 .btn-tab.selected{
 	font-weight: bold;
 	background-color: #fff;
-	color: #9dbc8b;
+	color: #6ad1e6;
 	
 }
 
@@ -72,7 +71,7 @@ body {
 }
 
 .tabTron {
-	background-color: #9dbc8b;
+	background-color: #6ad1e6;
 	margin-top: 1px;
 }
 
@@ -86,7 +85,7 @@ body {
 }
 
 .statsRow h4{
-	color: #9dbc8b;
+	color: #6ad1e6;
 }
 
 .statsRow h3{
@@ -94,7 +93,20 @@ body {
 }
 
 .footer {
-    background-color: #dddddd;
+    background-color: #6ad1e6;
+    padding: 0px;
+    margin-bottom: 0px;
+}
+
+.footer .card {
+	
+	background-color: #fff;
+	margin: ;	
+
+}
+
+.footer .card * {
+	color: #6ad1e6;
 }
 
 svg {
@@ -115,25 +127,25 @@ linechart {
 }
 
 .btn-chart {
-	background-color: #f2f2f2;
-	color: #9dbc8b;
+	background-color: #fff;
+	color: #6ad1e6;
 	margin-bottom: 20px;
     transition: all 0.4s ease;
-    border: 1px solid #9dbc8b;
+    border: 1px solid #6ad1e6;
 }
 
 .btn-chart:hover {
 	background-color: white;
-	color: #9dbc8b;
+	color: #6ad1e6;
 }
 
 .btn-chart.selected {
-	background-color:#9dbc8b;
-	color: #f2f2f2;
+	background-color:#6ad1e6;
+	color: #fff;
 }
 
 .panel-body h5{
-	color: #9dbc8b;
+	color: #6ad1e6;
 }
 
 .panel-default > .panel-heading {

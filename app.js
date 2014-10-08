@@ -3,8 +3,11 @@
 (function() {
    var awareApp = angular.module('awareApp', ['firebase', 'n3-line-chart']);
 
-   awareApp.factory('DataMetaRepository', function($firebase) {
-      var ref = new Firebase("https://elmaaler.firebaseio.com/dataMeta");
+   awareApp.constant('FB_URL', 'https://elmaaler.firebaseio.com/device/23436f3643fc42ee/');
+   awareApp.constant('TIMEZONE_OFFSET', 2);
+
+   awareApp.factory('DataMetaRepository', function($firebase, FB_URL) {
+      var ref = new Firebase(FB_URL + '/dataMeta');
       var data = $firebase(ref).$asArray();
       return {
          get: function() {
@@ -13,12 +16,12 @@
       }
    });
 
-   awareApp.factory('DataRepository', function($firebase) {
+   awareApp.factory('DataRepository', function($firebase, FB_URL) {
       var data;
 
       var DataRepository = {};
       DataRepository.setup = function(key) {
-         data = $firebase(new Firebase("https://elmaaler.firebaseio.com/data/" + key + '/raw')).$asArray();
+         data = $firebase(new Firebase(FB_URL + '/data/' + key + '/raw')).$asArray();
       };
       DataRepository.data = function() {
          return data;
@@ -30,17 +33,17 @@
       return DataRepository;
    });
 
-   awareApp.controller('PowerController', ['$firebase', 'DataMetaRepository', 'DataRepository',
-      function($firebase, DataMetaRepository, DataRepository) {
+   awareApp.controller('PowerController', ['$firebase', 'DataMetaRepository', 'DataRepository', 'FB_URL', 'TIMEZONE_OFFSET',
+      function($firebase, DataMetaRepository, DataRepository, FB_URL, TIMEZONE_OFFSET) {
          console.log('Aware starting');
          var self = this;
-         
+
          // For the correction algo in the $watch
          var unverfiedUsage = false;
          this.correctorEnabled = false;
-         
+
          this.currentPrice = 2.2;
-         
+
          this.dataMeta = DataMetaRepository.get();
          // Initialse data
          this.dataMeta.$loaded().then(function(dataMeta) {
@@ -52,14 +55,15 @@
             self.selectedDataset = self.dataMeta[0];
             self.changeDataset();
             self.setPlotTime(30);
-            
+
             // Load complete, show page
             $('#splash').fadeOut();
          });
-         
+
          this.plotOptions = {
             axes: {
                x: {
+                  type: 'date',
                   labelFunction: function(value) {
                      return value + ' s';
                   }
@@ -73,7 +77,7 @@
             },
             series: [{
                y: 'usage',
-               color: '#9dbc8b',
+               color: '#6ad1e6',
                thickness: '1px',
                type: 'area',
                label: 'Watt'
@@ -90,7 +94,7 @@
             drawDots: false,
             columnsHGap: 5
          };
-         
+
          this.setPlotTime = function(minutes) {
             minutes = parseInt(minutes || 0);
             var oldMinutes = this.plotMinutes || 0;
@@ -98,12 +102,12 @@
                return;
             }
             this.plotMinutes = minutes;
-            
+
             if ((minutes > oldMinutes && oldMinutes !== 0) || minutes === 0) {
                // Need to add data, reset to solve this
                this.changeDataset();
             }
-            
+
             // Trim what is needed
             this.trimPlotToInterval();
          }
@@ -115,94 +119,112 @@
 
             this.currentUsage = 'Collecting data...';
             this.totalUsage = 0;
-            this.plotTimeZero = 'undefined';
+            this.timeStamp = 'undefined';
             this.plotData = [];
 
             DataRepository.setup(this.selectedDataset.data_id);
             this.data = DataRepository.data();
             this.data.$watch(function(event) {
                if (event.event === 'child_added') {
-                  // New data
-                  self.data.$getRecord(event.key).verified = false;
-                  self.totalUsage++;
-                  if (event.prevChild === null) {
+                  var current = self.data.$getRecord(event.key);
+                  if (current.hasOwnProperty('timeStamp')) {
+                     // Device restarted, new series beginning.
+                     self.timeStamp = current.timeStamp;
+
+                     //TODO: Any resets ?
                      return;
                   }
+                  else if (current.hasOwnProperty('timeDiff')) {
+                     // New data
+                     self.data.$getRecord(event.key).verified = false;
+                     self.totalUsage++;
 
-                  var current = self.data.$getRecord(event.key);
-                  var prev = self.data.$getRecord(event.prevChild);
-                  var usage = self.calculateUsage(current, prev);
-
-                  if (self.correctorEnabled) {
-
-                     if (self.unverfiedUsage) {
-                        // Comparison of current usage vs last unverified usage
-
-                        var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
-                        var diff = Math.abs(usage - lastVerifiedUsage);
-                        if (diff > 0.05 * lastVerifiedUsage) {
-                           console.log('Alright, load must have changed');
-                           self.addDataToPlot(prev, self.unverfiedUsage);
-                        }
-                        else {
-                           console.log('Correcting data');
-                           self.addDataToPlot(prev, usage);
-                        }
-
-                        self.unverfiedUsage = false;
+                     if (event.prevChild === null) {
+                        // No previous point => no calculation
+                        return;
                      }
-                     else {
-                        if (self.plotData.length > 1) {
-                           // Comparison of current usage vs last verified usage
+                     var prev = self.data.$getRecord(event.prevChild);
+                     if (!prev.hasOwnProperty('timeDiff')) {
+                        // No previous point => no calculation
+                        return;
+                     }
+
+                     var usage = self.calculateUsage(current, prev);
+
+                     if (self.correctorEnabled) {
+                        // TODO: NB: Corrector might not work with new data format :<
+
+                        if (self.unverfiedUsage) {
+                           // Comparison of current usage vs last unverified usage
+
                            var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
                            var diff = Math.abs(usage - lastVerifiedUsage);
                            if (diff > 0.05 * lastVerifiedUsage) {
-                              // Max 10% diff filter
-                              console.log('Diff to big, not verified');
-                              self.unverfiedUsage = usage;
-                              return;
+                              console.log('Alright, load must have changed');
+                              self.addDataToPlot(prev, self.unverfiedUsage);
+                           }
+                           else {
+                              console.log('Correcting data');
+                              self.addDataToPlot(prev, usage);
+                           }
+
+                           self.unverfiedUsage = false;
+                        }
+                        else {
+                           if (self.plotData.length > 1) {
+                              // Comparison of current usage vs last verified usage
+                              var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
+                              var diff = Math.abs(usage - lastVerifiedUsage);
+                              if (diff > 0.05 * lastVerifiedUsage) {
+                                 // Max 10% diff filter
+                                 console.log('Diff to big, not verified');
+                                 self.unverfiedUsage = usage;
+                                 return;
+                              }
                            }
                         }
-                     }
+                     } // end-if self.correctorEnabled 
+
+                     self.addDataToPlot(current, usage);
+                  }
+                  else {
+                     console.warn('Unknown raw data point encountered: %o', current);
                   }
 
-                  self.addDataToPlot(current, usage);
-               }
+               } // end-if event.event === 'child_added'
             });
          };
 
          this.calculateUsage = function(prev, current) {
-            var time = prev.timeStamp - current.timeStamp;
+            var time = prev.timeDiff - current.timeDiff;
             time = time / 1000.0;
             return Math.round(3600 / time);
          };
 
          this.addDataToPlot = function(dataPoint, usage) {
-            // Add to plot data
-            if (this.plotTimeZero === 'undefined') {
-               this.plotTimeZero = dataPoint.timeStamp;
-            }
-
             this.currentUsage = usage;
 
+            //var timezoneOffset = TIMEZONE_OFFSET * 3600;
+            var pointTimeStamp = this.timeStamp * 1000 + dataPoint.timeDiff;
+
             this.plotData.push({
-               x: Math.round((dataPoint.timeStamp - this.plotTimeZero) / 1000),
+               x: new Date(pointTimeStamp),
                usage: usage
             });
-            
+
             this.trimPlotToInterval();
          };
-         
+
          this.trimPlotToInterval = function() {
             if (this.plotMinutes === 0 || this.plotData.length === 0) {
                // No triming
                return;
             }
-            
-            var newestTime = this.plotData[this.plotData.length - 1].x;
-            var timeDiff = this.plotMinutes * 60;
+
+            var newestDate = this.plotData[this.plotData.length - 1].x;
+            var timeDiff = this.plotMinutes * 60 * 1000;
             for (var i = 0; i < this.plotData.length - 1; i++) {
-               if (this.plotData[i].x < newestTime - timeDiff) {
+               if (this.plotData[i].x.getTime() < newestDate.getTime() - timeDiff) {
                   this.plotData.shift();
                   i--;
                }
@@ -217,17 +239,28 @@
 
             // Copy incoming data
             var currentData = [];
+            var newestTimeStamp;
             angular.forEach(this.data, function(rawDataPoint) {
-               this.push({
-                  timeStamp: rawDataPoint.timeStamp
-               });
+               var currentPoint = {};
+               if (rawDataPoint.hasOwnProperty('timeStamp')) {
+                  newestTimeStamp = rawDataPoint;
+                  currentPoint.timeStamp = rawDataPoint.timeStamp;
+               }
+               else if (rawDataPoint.hasOwnProperty('timeDiff')) {
+                  currentPoint.timeDiff = rawDataPoint.timeDiff;
+               }
+               else {
+                  console.warn('Unknown raw data point encountered: %o', rawDataPoint);
+               }
+               this.push(currentPoint);
             }, currentData);
 
             // Remove incoming data
-            $firebase(new Firebase("https://elmaaler.firebaseio.com/data/incoming")).$remove();
+            $firebase(new Firebase(FB_URL + '/data/incoming')).$remove();
+            //TODO: Insert newest timestamp at head of raw data
 
             // Save current data
-            $firebase(new Firebase("https://elmaaler.firebaseio.com/data/")).$push({
+            $firebase(new Firebase(FB_URL + 'data/')).$push({
                raw: currentData
             }).then(function(data_ref) {
                self.dataMeta.$add({
