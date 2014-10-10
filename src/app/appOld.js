@@ -1,54 +1,19 @@
 'use strict';
 
 (function() {
-   var awareApp = angular.module('awareApp', ['firebase', 'n3-line-chart']);
+   var awareApp = angular.module('awareAppOld', ['firebase', 'moras.config', 'moras.auth', 'aware.admin', 'aware.dashboard', 'n3-line-chart']);
 
-   awareApp.constant('FB_URL', 'https://elmaaler.firebaseio.com/');
-   awareApp.constant('TIMEZONE_OFFSET', 2);
-
-   awareApp.factory('DataMetaRepository', function($firebase, FB_URL) {
-      var data;
-
-      var DataMetaRepository = {};
-      DataMetaRepository.setup = function(device) {
-         data = $firebase(new Firebase(FB_URL + 'device/' + device + '/' + '/dataMeta')).$asArray();
-      };
-      DataMetaRepository.data = function() {
-         return data;
-      };
-
-      return DataMetaRepository;
-   });
-
-   awareApp.factory('DataRepository', function($firebase, FB_URL) {
-      var data;
-
-      var DataRepository = {};
-      DataRepository.setup = function(device, key) {
-         data = $firebase(new Firebase(FB_URL + 'device/' + device + '/' + '/data/' + key + '/raw')).$asArray();
-      };
-      DataRepository.data = function() {
-         return data;
-      };
-      DataRepository.destroy = function() {
-         data.$destroy();
-      };
-
-      return DataRepository;
-   });
-
-   awareApp.controller('PowerController', ['$firebase', 'DataMetaRepository', 'DataRepository', 'FB_URL', 'TIMEZONE_OFFSET',
-      function($firebase, DataMetaRepository, DataRepository, FB_URL, TIMEZONE_OFFSET) {
+   awareApp.controller('PowerController', ['$firebase', 'DataService', 'DatametaService', 'FB_URI',
+      function($firebase, DataService, DatametaService, FB_URI) {
          console.log('Aware starting');
          var self = this;
 
          this.authed = false;
 
-         this.rootRef = new Firebase(FB_URL);
+         this.rootRef = new Firebase(FB_URI);
          this.rootRef.onAuth(function(authData) {
             if (authData) {
                console.log('Auth data found. User is logged in.');
-
                // HAX
                if (this.loginForm && this.loginForm.newUser) {
                   this.rootRef.child('users').child(authData.uid).set({
@@ -67,8 +32,8 @@
                deviceRef.on('value', function(snapshot) {
                   this.device = snapshot.val();
 
-                  DataMetaRepository.setup(this.device);
-                  this.dataMeta = DataMetaRepository.data();
+                  DatametaService.setup(this.device);
+                  this.dataMeta = DatametaService.data();
                   // Initialse data
                   this.dataMeta.$loaded().then(function(dataMeta) {
                      self.dataMeta.unshift({
@@ -92,49 +57,6 @@
                this.authed = false;
             }
          }, this);
-
-         this.createUser = function() {
-            this.rootRef.createUser({
-               email: this.loginForm.email,
-               password: this.loginForm.password
-            }, function(error) {
-               if (error) {
-                  switch (error.code) {
-                     case 'EMAIL_TAKEN':
-                        console.log('Error creating user. Email taken: ' + self.loginForm.email);
-                        break;
-                     case 'INVALID_EMAIL':
-                        console.log('Error creating user. Invalid email: ' + self.loginForm.email);
-                        break;
-                     default:
-                        console.log('Error creating user. Unknown error: %o', error);
-                  }
-               }
-               else {
-                  console.log('User successfully created: ' + self.loginForm.email);
-               }
-            });
-         };
-
-         this.login = function() {
-            this.rootRef.authWithPassword({
-               email: this.loginForm.email,
-               password: this.loginForm.password
-            }, function(error, authData) {
-               if (error) {
-                  console.log('Error loging in. Unknown error: %o', error);
-               }
-               else {
-                  console.log('User successfully logged in: %o', authData);
-               }
-            }, {
-               remember: false
-            });
-         };
-
-         this.logout = function() {
-            this.rootRef.unauth();
-         }
 
          // For the correction algo in the $watch
          var unverfiedUsage = false;
@@ -196,7 +118,7 @@
 
          this.changeDataset = function() {
             if (typeof this.data !== 'undefined') {
-               DataRepository.destroy();
+               DataService.destroy();
             }
 
             this.currentUsage = 'Collecting data...';
@@ -204,15 +126,15 @@
             this.timeStamp = 'undefined';
             this.plotData = [];
 
-            DataRepository.setup(this.device, this.selectedDataset.data_id);
-            this.data = DataRepository.data();
+            DataService.setup(this.device, this.selectedDataset.data_id);
+            this.data = DataService.data();
             this.data.$watch(function(event) {
                if (event.event === 'child_added') {
                   //jQuery('.pulse').addClass('animated bounce');
                   //$('.pulse').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', $('animated bounce').remove());
                   
-                  $('.mainCounter').removeClass().addClass('pulse' + ' animated' + ' mainCounter').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-                  $(this).removeClass().addClass('mainCounter');
+                  $('.widget-round').removeClass().addClass('pulse' + ' animated' + ' widget-round').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+                  $(this).removeClass().addClass('widget-round');
                   });
                   var current = self.data.$getRecord(event.key);
                   if (current.hasOwnProperty('timeStamp')) {
@@ -320,51 +242,6 @@
                   break;
                }
             }
-         };
-
-         this.saveDataset = function() {
-            var self = this;
-
-            // Copy incoming data
-            var currentData = [];
-            var newestTimeStamp;
-            angular.forEach(this.data, function(rawDataPoint) {
-               var currentPoint = {};
-               if (rawDataPoint.hasOwnProperty('timeStamp')) {
-                  newestTimeStamp = rawDataPoint;
-                  currentPoint.timeStamp = rawDataPoint.timeStamp;
-               }
-               else if (rawDataPoint.hasOwnProperty('timeDiff')) {
-                  currentPoint.timeDiff = rawDataPoint.timeDiff;
-               }
-               else {
-                  console.warn('Unknown raw data point encountered: %o', rawDataPoint);
-               }
-               this.push(currentPoint);
-            }, currentData);
-
-            // Remove incoming data
-            $firebase(new Firebase(FB_URL + 'device/23436f3643fc42ee/' + '/data/incoming')).$remove();
-            //TODO: Insert newest timestamp at head of raw data
-
-            // Save current data
-            $firebase(new Firebase(FB_URL + 'device/23436f3643fc42ee/' + 'data/')).$push({
-               raw: currentData
-            }).then(function(data_ref) {
-               self.dataMeta.$add({
-                  title: self.newDataset.title,
-                  data_id: data_ref.name()
-               }).then(function(data_meta_ref) {
-                  self.selectedDataset = self.dataMeta.$getRecord(data_meta_ref.name());
-                  self.changeDataset();
-               })
-               self.newDataset.title = '';
-
-            });
-         };
-         
-         this.toggleSplash = function() {
-            $('#splash').fadeToggle();
          };
 
       }

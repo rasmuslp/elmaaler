@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+
+<html ng-app="awareApp">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aware</title>
+  <style type="text/css">
+    #splash {
+      position: absolute;
+      display: block;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      background-color: #6ad1e6;
+      z-index: 10;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body ng-controller="PowerController as pwrCtrl">
+  <div id="splash" class="jumbotron">
+    <div class="container mainSplash">
+      <div class="col-md-2 "></div>
+
+      <div class="col-md-4 fadeInLeft animated">
+        <img src="assets/logo.png" class="img img-responsive img-center">
+      </div>
+
+      <div class="col-md-4 loginBox fadeInRight animated" ng-controller="AuthController as authCtrl">
+        <p class="bg-success" ng-cloak ng-hide="pwrCtrl.userError">{{pwrCtrl.userError}}</p>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Email address</label>
+          <input type="email" class="form-control" ng-model="authCtrl.credentials.email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Password</label>
+          <input type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Password">
+        </div>
+        <div class="form-group password2  animated fadeIn" ng-show="authCtrl.credentials.newUser === true">
+          <label for="exampleInputEmail2">Re-type password</label>
+          <input type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Re-type Password">
+        </div>
+        <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-click="authCtrl.createUser(); authCtrl.credentials.newUser = !authCtrl.credentials.newUser;"><span class="glyphicon glyphicon-log-out"> Create User</span>
+        </button>
+        <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
+          <button ng-show="pwrCtrl.authed" type="" class="btn bnt-login" ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
+          </button>
+      </div>
+
+    </div>
+  </div>
+
+<!--  <div class="jumbotron logoTron">
+    <div class="container">
+      <div class="row">
+        <img src="assets/logo.png" class="img img-responsive img-center logo">
+      </div>
+    </div>
+  </div>-->
+
+  <div class="navbar navbar-default navbar-inverse navbar-fixed-top specialMenu" ng-show="pwrCtrl.authed" ng-cloak role="navigation">
+      <div class="container">
+              <div class="navbar-center"></div>
+
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><img src="assets/logo.png" class="img logo"></a>
+        </div>
+        
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="../navbar/">Logout</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+  <div class="tabTron" style="display:none">
+    <div class="tabContainer">
+      <div class="btn-group tabButtons">
+        <button type="button" class="btn btn-tab" ng-click="tab = 1" ng-class="{selected:tab === 1}">Why be aware?</button>
+        <button type="button" class="btn btn-tab" ng-click="tab = 2" ng-class="{selected:tab === 2}">About</button>
+        <button type="button" class="btn btn-tab" ng-click="tab = 3" ng-class="{selected:tab === 3}">Product</button>
+      </div>
+      <div class="text" ng-init="tab=1">
+        <hr>
+
+        <div class="tab-content" ng-show="tab === 1">
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+          in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        </div>
+
+        <div class="tab-content" ng-show="tab === 2" ng-animate="animate">
+          Nummer 2
+        </div>
+        <div class="tab-content" ng-show="tab === 3">
+          Tab 3
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pulse">
+    <!--Indication pulse-->
+  </div>
+
+
+<!--  <div class="jumbotron" id="pulse">
+     <div class="row">
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4">
+      <div class="widget widget-round">
+        <h2>{{pwrCtrl.currentUsage}}</h2>
+        <p>watt</p>
+      </div>
+    </div>
+  </div>-->
+    
+  </div>
+  
+  <div class="jumbotron" id="stats">
+
+  
+  <div class="container">
+  
+ 
+  
+    <div class="row">
+      <div class="btn-group chartButtons" ng-init="range = 4">
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(0); range = 1" ng-class="{selected:range === 1}">All Data</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2" ng-class="{selected:range === 2}">Last 24 hours</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3" ng-class="{selected:range === 3}">Last hour</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4" ng-class="{selected:range === 4}">Last 30 minutes</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(5); range = 5" ng-class="{selected:range === 5}">Last 5 minutes</button>
+      </div>
+</div>
+
+
+
+    <div class="col-xs-6 col-md-3">
+      <div class="widget widget-rect">
+        <h5>Current Usage</h5>
+        <h2>{{pwrCtrl.currentUsage}}</h2>
+        <p>watt</p>
+      </div>
+    </div>
+    <div class="col-xs-6 col-md-3">
+      <div class="widget widget-rect">
+        <h5>Total Usage</h5>
+        <h2>{{pwrCtrl.totalUsage / 1000 | number: 3}}</h2>
+        <p>kWh</p>
+      </div>
+    </div>
+
+    <div class="col-xs-6 col-md-3">
+      <div class="widget widget-rect">
+        <h5>Current Usage</h5>
+        <h2>{{pwrCtrl.totalUsage}}</h2>
+        <p>kWh</p>
+      </div>
+    </div>
+    
+    <div class="col-xs-6 col-md-3">
+      <div class="widget widget-rect">
+        <h5>Current Usage</h5>
+        <h2>{{pwrCtrl.totalUsage}}</h2>
+        <p>kWh</p>
+      </div>
+    </div>
+
+    <div class="col-xs-6 col-md-3">
+      <div class="widget widget-rect">
+        <h5>Current Usage</h5>
+        <h2>{{pwrCtrl.totalUsage}}</h2>
+        <p>kWh</p>
+      </div>
+    </div>
+
+    <div class="col-xs-6 col-md-3">
+      <div class="widget widget-rect">
+        <h5>Current Usage</h5>
+        <h2>{{pwrCtrl.currentPrice}}</h2>
+        <p>DKK</p>
+      </div>
+    </div>
+     
+     <div class="col-xs-6 col-md-3" ng-show="pwrCtrl.currentPrice">
+      <div class="widget widget-rect">
+        <h5>Current Usage</h5>
+        <h2>{{pwrCtrl.currentPrice}}</h2>
+        <p>DKK</p>
+      </div>
+    </div>
+    
+    <div class="col-xs-6 col-md-3">
+      <div class="widget widget-rect">
+        <h5>Current Usage</h5>
+        <h2>{{pwrCtrl.currentPrice}}</h2>
+        <p>DKK</p>
+      </div>
+    </div>
+    
+  </div>
+    </div>
+
+  
+  
+
+  <div class="jumbotron" id="graph">
+  <div class="container">
+    <div class="chart">
+      <linechart class="chart" data="pwrCtrl.plotData" options="pwrCtrl.plotOptions"></linechart>
+    </div>
+  </div>
+    <!--<div range-slider="range-slider" min="1000" max="10000" model-min="1000" model-max="10000">-->
+
+  <div class="panel panel-default adminPanel" ng-controller="AdminController as adminCtrl">
+    <div class="panel-heading aware-heading">Admin panel</div>
+    <div class="panel-body">
+      <button ng-click="adminCtrl.toggleSplash()" class="btn btn-default">Toggle Splash</button>
+      <hr>
+      <div class="form-group">
+        <input class="form form-control" ng-model="adminCtrl.newDataset.title">
+      </div>
+      <button ng-click="adminCtrl.saveDataset()" class="btn btn-default">Save dataset</button>
+      <hr>
+      <h5>Select dataset:</h5>
+      <select ng-model="pwrCtrl.selectedDataset" ng-change="pwrCtrl.changeDataset()" class="form-control" ng-options="dataMeta.title for dataMeta in pwrCtrl.dataMeta">
+      </select>
+      <br/>
+
+    </div>
+  </div>
+  </div>
+
+  <div class="jumbotron footer" style="display:none">
+    <div class="container">
+      <div class="row">
+        <div class="card col-sm-4">
+          <h4 class="text-center">Current Usage</h4>
+          <h3 class="text-center">{{pwrCtrl.currentUsage}}<br /><small> Watt</small></h3>
+        </div>
+
+        <div class="card col-sm-4">
+          <h4 class="text-center">Total Usage</h4>
+          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 | number: 3}}<br /><small> kWh</small></h3>
+        </div>
+
+        <div class="card col-sm-4">
+          <h2>
+            This is how old we are:
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!--  <div class="tabs-striped tabs-background-positive tabs-light">
+    <div class="tabs">
+      <a class="tab-item active" href="#">
+        <i class="icon ion-home"></i>
+        Test
+      </a>
+      <a class="tab-item" href="#">
+        <i class="icon ion-star"></i>
+        Favorites
+      </a>
+      <a class="tab-item" href="#">
+        <i class="icon ion-gear-a"></i>
+        Settings
+      </a>
+    </div>
+  </div>-->
+</body>
+
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="//code.ionicframework.com/1.0.0-beta.13/css/ionic.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" />
+
+<link rel="stylesheet" href="css/style.css" />
+
+<script type="text/javascript" charset="utf-8" src="//code.jquery.com/jquery-2.1.1.js"></script>
+<script type="text/javascript" charset="utf-8" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.js"></script>
+<script type="text/javascript" charset="utf-8" src="//code.angularjs.org/1.2.26/angular.js"></script>
+<script type="text/javascript" charset="utf-8" src="//code.angularjs.org/1.2.26/angular-animate.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdn.firebase.com/js/client/1.1.1/firebase.js"></script>
+<script type="text/javascript" charset="utf-8" src="//cdn.firebase.com/libs/angularfire/0.8.2/angularfire.js"></script>
+<script type="text/javascript" charset="utf-8" src="//code.ionicframework.com/1.0.0-beta.13/js/ionic.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://d3js.org/d3.v3.min.js"></script>
+
+<script type="text/javascript" charset="utf-8" src="../vendor/ui-router-0.2.11/angular-ui-router.js"></script>
+<script type="text/javascript" charset="utf-8" src="../vendor/line-chart/line-chart.js"></script>
+
+<script type="text/javascript" charset="utf-8" src="app/app.js"></script>
+<script type="text/javascript" charset="utf-8" src="app/appOld.js"></script>
+<script type="text/javascript" charset="utf-8" src="app/admin/admin.js"></script>
+<script type="text/javascript" charset="utf-8" src="app/admin/admin-controller.js"></script>
+<script type="text/javascript" charset="utf-8" src="app/dashboard/dashboard.js"></script>
+<script type="text/javascript" charset="utf-8" src="app/dashboard/data-service.js"></script>
+<script type="text/javascript" charset="utf-8" src="app/dashboard/datameta-service.js"></script>
+<script type="text/javascript" charset="utf-8" src="components/config/config.js"></script>
+<script type="text/javascript" charset="utf-8" src="components/auth/auth.js"></script>
+<script type="text/javascript" charset="utf-8" src="components/auth/auth-controller.js"></script>
+<script type="text/javascript" charset="utf-8" src="components/auth/auth-service.js"></script>
+
+<script>
+$(window).scroll(function() {
+if ($(document).scrollTop() > 150) {
+$('.specialMenu').addClass('shrink');
+}
+else {
+$('.specialMenu').removeClass('shrink'); }
+});
+</script>
+
+</html>
