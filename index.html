@@ -32,92 +32,134 @@
 </head>
 
 <body ng-controller="PowerController as pwrCtrl">
-
   <div id="splash">
-    <!--<img alt="spinner" src="data:image/gif;base64,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"/>-->
-  </div>
-
-  <div class="jumbotron logoTron">
     <center>
-      <img src="logo.png" class="img img-responsive logo">
-    </center>
-  </div>
-
-  <div class="tabTron">
-    <center>
-      <div class="tabContainer">
-        <div class="btn-group tabButtons">
-          <button type="button" class="btn btn-tab" ng-click="tab = 1" ng-class="{selected:tab === 1}">Why be aware?</button>
-          <button type="button" class="btn btn-tab" ng-click="tab = 2" ng-class="{selected:tab === 2}">About</button>
-          <button type="button" class="btn btn-tab" ng-click="tab = 3" ng-class="{selected:tab === 3}" >Product</button>
-        </div>
-        <div class="text" ng-init="tab=1">
-                <hr>
-
-          <div class="tab-content" ng-show="tab === 1">
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-          in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-          </div>
-          
-          <div class="tab-content" ng-show="tab === 2" ng-animate="animate">
-          Nummer 2
-          </div>
-          <div class="tab-content" ng-show="tab === 3">
-          Tab 3
+      <div class="loginTron">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+            <p class="bg-success" ng-show="pwrCtrl.userError">{{pwrCtrl.userError}}</p>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Email address</label>
+              <input type="email" class="form-control" ng-model="pwrCtrl.loginForm.email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Password</label>
+              <input type="password" class="form-control" ng-model="pwrCtrl.loginForm.password" placeholder="Password">
+            </div>
+            <div class="form-group password2" ng-show="pwrCtrl.loginForm.newUser === true" >
+              <label for="exampleInputEmail2">Re-type password</label>
+              <input type="password" class="form-control" ng-model="pwrCtrl.loginForm.password" placeholder="Re-type Password">
+            </div>
+            <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-click="pwrCtrl.createUser(); pwrCtrl.loginForm.newUser = !pwrCtrl.loginForm.newUser;"><span class="glyphicon glyphicon-log-out"> Create User</span>
+            </button>
+            <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-click="pwrCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
+              <button ng-show="pwrCtrl.authed" type="" class="btn bnt-login" ng-click="pwrCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
+              </button>
+            </div>
+            <div class="col-md-6"><img src="logo.png" class="img img-contered img-responsive"></div>
           </div>
         </div>
-
       </div>
     </center>
   </div>
 
-  <div class="jumbotron statsTron">
+  
+  <div class="jumbotron logoTron">
     <div class="container">
       <div class="row">
-        <div class="card col-sm-4 statsRow">
-          <h4 class="text-center">Current Usage</h4>
-          <h3 class="text-center">{{pwrCtrl.currentUsage}}<br /><small> Watt</small></h3>
-        </div>
-
-        <div class="card col-sm-4 statsRow">
-          <h4 class="text-center">Total Usage</h4>
-          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 | number: 3}}<br /><small> kWh</small></h3>
-        </div>
-
-        <div class="card col-sm-4 statsRow">
-          <h4 class="text-center">Total Price</h4>
-          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
-        </div>
-      </div>
-      
-      <div class="row">
-        <div class="card col-sm-4 statsRow">
-          <h4 class="text-center">Total Price</h4>
-          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
-        </div>
-                <div class="card col-sm-4 statsRow">
-          <h4 class="text-center">Total Price</h4>
-          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
-        </div>
-                <div class="card col-sm-4 statsRow">
-          <h4 class="text-center">Total Price</h4>
-          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
-        </div>
+        <img src="logo.png" class="img img-responsive img-center logo">
       </div>
     </div>
   </div>
 
-  <div class="container fluid">
-      <center>
+  <div class="tabTron" style="display:none">
+      <div class="tabContainer">
+        <div class="btn-group tabButtons">
+          <button type="button" class="btn btn-tab" ng-click="tab = 1" ng-class="{selected:tab === 1}">Why be aware?</button>
+          <button type="button" class="btn btn-tab" ng-click="tab = 2" ng-class="{selected:tab === 2}">About</button>
+          <button type="button" class="btn btn-tab" ng-click="tab = 3" ng-class="{selected:tab === 3}">Product</button>
+        </div>
+        <div class="text" ng-init="tab=1">
+          <hr>
+
+          <div class="tab-content" ng-show="tab === 1">
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+            in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+          </div>
+
+          <div class="tab-content" ng-show="tab === 2" ng-animate="animate">
+            Nummer 2
+          </div>
+          <div class="tab-content" ng-show="tab === 3">
+            Tab 3
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="pulse">
+  <!--Indication pulse-->
+  </div>
+  <div class="container">
+    <div class="col-md-3">
+    </div>
+      <div class="col-md-2">
+          <div class="widget-round">
+            {{pwrCtrl.currentUsage}}
+            <p>watt</p>
+          </div>
+          <div class="col-md-3"></div>
+      </div>
+      <div class="col-md-2">
+        <div class="widget-round">
+          {{pwrCtrl.totalUsage}}
+          <p>kWh</p>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="widget-round">
+          {{pwrCtrl.currentPrice}}
+          <p>DKK</p>
+        </div>
+      </div>
+  </div>
+  <div class="jumbotron statsTron">
+
+    <center>
       <div class="btn-group chartButtons" ng-init="range = 4">
         <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(0); range = 1" ng-class="{selected:range === 1}">All Data</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2"  ng-class="{selected:range === 2}">Last 24 hours</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3"  ng-class="{selected:range === 3}">Last hour</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4"  ng-class="{selected:range === 4}">Last 30 minutes</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(5); range = 5"  ng-class="{selected:range === 5}">Last 5 minutes</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2" ng-class="{selected:range === 2}">Last 24 hours</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3" ng-class="{selected:range === 3}">Last hour</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4" ng-class="{selected:range === 4}">Last 30 minutes</button>
+        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(5); range = 5" ng-class="{selected:range === 5}">Last 5 minutes</button>
 
       </div>
     </center>
+
+
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 col-sm-12 statsRow">
+          <h4>Current Usage</h4>
+          <h3>{{pwrCtrl.currentUsage}}<br /><small> Watt</small></h3>
+        </div>
+        <div class="col-md-4 col-sm-12 statsRow">
+          <h4>Total Usage</h4>
+          <h3>{{pwrCtrl.totalUsage / 1000 | number: 3}}<br /><small> kWh</small></h3>
+        </div>
+        <div class="col-md-4 col-sm-12 statsRow">
+          <h4>Total Price</h4>
+          <h3>{{pwrCtrl.totalUsage / 1000 * 2.2 | number:2}}<br /><small> DKK</small></h3>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <div class="container fluid">
+
     <div class="chart">
       <linechart class="chart" data="pwrCtrl.plotData" options="pwrCtrl.plotOptions"></linechart>
     </div>
@@ -127,6 +169,8 @@
   <div class="panel panel-default adminPanel">
     <div class="panel-heading aware-heading">Admin panel</div>
     <div class="panel-body">
+      <button ng-click="pwrCtrl.toggleSplash()" class="btn btn-default">Toggle Splash</button>
+      <hr>
       <div class="form-group">
         <input class="form form-control" ng-model="pwrCtrl.newDataset.title">
       </div>
@@ -140,7 +184,7 @@
     </div>
   </div>
 
-<div class="jumbotron footer">
+  <div class="jumbotron footer" style="display:none">
     <div class="container">
       <div class="row">
         <div class="card col-sm-4">
@@ -161,7 +205,17 @@
       </div>
     </div>
   </div>
-  
+<div class="container">
+  <div class="row">
+    <div class="col-md-4 col-sm-12">test
+    </div>
+    <div class="col-md-4 col-sm-12">test
+    </div>
+    <div class="col-md-4 col-sm-12">test
+    </div>
+  </div>
+</div>
+
   <!--  <div class="tabs-striped tabs-background-positive tabs-light">
     <div class="tabs">
       <a class="tab-item active" href="#">
@@ -178,26 +232,28 @@
       </a>
     </div>
   </div>-->
+</body>
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
   <link rel="stylesheet" href="//code.ionicframework.com/1.0.0-beta.13/css/ionic.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" />
+
   <link rel="stylesheet" href="style.css" />
   <script type="text/javascript" charset="utf-8" src="//code.jquery.com/jquery-2.1.1.js"></script>
   <script type="text/javascript" charset="utf-8" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.js"></script>
   <script type="text/javascript" charset="utf-8" src="//code.angularjs.org/1.2.25/angular.js"></script>
   <script type="text/javascript" charset="utf-8" src="//code.angularjs.org/1.2.25/angular-route.js"></script>
   <script type="text/javascript" charset="utf-8" src="//code.angularjs.org/1.2.25/angular-animate.js"></script>
-  <script type="text/javascript" charset="utf-8" src="//cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
+  <script type="text/javascript" charset="utf-8" src="//cdn.firebase.com/js/client/1.1.1/firebase.js"></script>
   <script type="text/javascript" charset="utf-8" src="//cdn.firebase.com/libs/angularfire/0.8.2/angularfire.js"></script>
   <script type="text/javascript" charset="utf-8" src="//code.ionicframework.com/1.0.0-beta.13/js/ionic.min.js"></script>
   <script type="text/javascript" charset="utf-8" src="http://d3js.org/d3.v3.min.js"></script>
 
-  <script type="text/javascript" charset="utf-8" src="js/line-chart.js"></script>
+  <script type="text/javascript" charset="utf-8" src="libs/js/line-chart.js"></script>
 
-  <script type="text/javascript" charset="utf-8" src="javascript.js"></script>
-  <script type="text/javascript" charset="utf-8" src="app.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+  <script type="text/javascript" charset="utf-8" src="js/config.js"></script>
 
-</body>
 
 </html>

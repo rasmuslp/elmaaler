@@ -3,25 +3,29 @@
 (function() {
    var awareApp = angular.module('awareApp', ['firebase', 'n3-line-chart']);
 
-   awareApp.constant('FB_URL', 'https://elmaaler.firebaseio.com/device/23436f3643fc42ee/');
+   awareApp.constant('FB_URL', 'https://elmaaler.firebaseio.com/');
    awareApp.constant('TIMEZONE_OFFSET', 2);
 
    awareApp.factory('DataMetaRepository', function($firebase, FB_URL) {
-      var ref = new Firebase(FB_URL + '/dataMeta');
-      var data = $firebase(ref).$asArray();
-      return {
-         get: function() {
-            return data;
-         }
-      }
+      var data;
+
+      var DataMetaRepository = {};
+      DataMetaRepository.setup = function(device) {
+         data = $firebase(new Firebase(FB_URL + 'device/' + device + '/' + '/dataMeta')).$asArray();
+      };
+      DataMetaRepository.data = function() {
+         return data;
+      };
+
+      return DataMetaRepository;
    });
 
    awareApp.factory('DataRepository', function($firebase, FB_URL) {
       var data;
 
       var DataRepository = {};
-      DataRepository.setup = function(key) {
-         data = $firebase(new Firebase(FB_URL + '/data/' + key + '/raw')).$asArray();
+      DataRepository.setup = function(device, key) {
+         data = $firebase(new Firebase(FB_URL + 'device/' + device + '/' + '/data/' + key + '/raw')).$asArray();
       };
       DataRepository.data = function() {
          return data;
@@ -38,27 +42,105 @@
          console.log('Aware starting');
          var self = this;
 
+         this.authed = false;
+
+         this.rootRef = new Firebase(FB_URL);
+         this.rootRef.onAuth(function(authData) {
+            if (authData) {
+               console.log('Auth data found. User is logged in.');
+
+               // HAX
+               if (this.loginForm && this.loginForm.newUser) {
+                  this.rootRef.child('users').child(authData.uid).set({
+                     email: authData.password.email
+                  }, function(error) {
+                     if (error) {
+                        console.log('Could not create user data in FB: %o', error);
+                     }
+                     else {
+                        console.log('Successfully created user data.');
+                     }
+                  });
+               }
+
+               var deviceRef = this.rootRef.child('users').child(authData.uid).child('device');
+               deviceRef.on('value', function(snapshot) {
+                  this.device = snapshot.val();
+
+                  DataMetaRepository.setup(this.device);
+                  this.dataMeta = DataMetaRepository.data();
+                  // Initialse data
+                  this.dataMeta.$loaded().then(function(dataMeta) {
+                     self.dataMeta.unshift({
+                        data_id: 'incoming',
+                        title: 'Live'
+                     });
+
+                     self.selectedDataset = self.dataMeta[0];
+                     self.changeDataset();
+                     self.setPlotTime(30);
+
+                     // Load complete, show page
+                     $('#splash').fadeOut();
+                  });
+
+                  this.authed = true;
+               }, this);
+            }
+            else {
+               console.log('Auth data not found. User is not logged in.');
+               this.authed = false;
+            }
+         }, this);
+
+         this.createUser = function() {
+            this.rootRef.createUser({
+               email: this.loginForm.email,
+               password: this.loginForm.password
+            }, function(error) {
+               if (error) {
+                  switch (error.code) {
+                     case 'EMAIL_TAKEN':
+                        console.log('Error creating user. Email taken: ' + self.loginForm.email);
+                        break;
+                     case 'INVALID_EMAIL':
+                        console.log('Error creating user. Invalid email: ' + self.loginForm.email);
+                        break;
+                     default:
+                        console.log('Error creating user. Unknown error: %o', error);
+                  }
+               }
+               else {
+                  console.log('User successfully created: ' + self.loginForm.email);
+               }
+            });
+         };
+
+         this.login = function() {
+            this.rootRef.authWithPassword({
+               email: this.loginForm.email,
+               password: this.loginForm.password
+            }, function(error, authData) {
+               if (error) {
+                  console.log('Error loging in. Unknown error: %o', error);
+               }
+               else {
+                  console.log('User successfully logged in: %o', authData);
+               }
+            }, {
+               remember: false
+            });
+         };
+
+         this.logout = function() {
+            this.rootRef.unauth();
+         }
+
          // For the correction algo in the $watch
          var unverfiedUsage = false;
-         this.correctorEnabled = false;
+         this.correctorEnabled = true;
 
          this.currentPrice = 2.2;
-
-         this.dataMeta = DataMetaRepository.get();
-         // Initialse data
-         this.dataMeta.$loaded().then(function(dataMeta) {
-            self.dataMeta.unshift({
-               data_id: 'incoming',
-               title: 'Live'
-            });
-
-            self.selectedDataset = self.dataMeta[0];
-            self.changeDataset();
-            self.setPlotTime(30);
-
-            // Load complete, show page
-            $('#splash').fadeOut();
-         });
 
          this.plotOptions = {
             axes: {
@@ -122,10 +204,16 @@
             this.timeStamp = 'undefined';
             this.plotData = [];
 
-            DataRepository.setup(this.selectedDataset.data_id);
+            DataRepository.setup(this.device, this.selectedDataset.data_id);
             this.data = DataRepository.data();
             this.data.$watch(function(event) {
                if (event.event === 'child_added') {
+                  //jQuery('.pulse').addClass('animated bounce');
+                  //$('.pulse').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', $('animated bounce').remove());
+                  
+                  $('.mainCounter').removeClass().addClass('pulse' + ' animated' + ' mainCounter').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+                  $(this).removeClass().addClass('mainCounter');
+                  });
                   var current = self.data.$getRecord(event.key);
                   if (current.hasOwnProperty('timeStamp')) {
                      // Device restarted, new series beginning.
@@ -256,11 +344,11 @@
             }, currentData);
 
             // Remove incoming data
-            $firebase(new Firebase(FB_URL + '/data/incoming')).$remove();
+            $firebase(new Firebase(FB_URL + 'device/23436f3643fc42ee/' + '/data/incoming')).$remove();
             //TODO: Insert newest timestamp at head of raw data
 
             // Save current data
-            $firebase(new Firebase(FB_URL + 'data/')).$push({
+            $firebase(new Firebase(FB_URL + 'device/23436f3643fc42ee/' + 'data/')).$push({
                raw: currentData
             }).then(function(data_ref) {
                self.dataMeta.$add({
@@ -273,6 +361,10 @@
                self.newDataset.title = '';
 
             });
+         };
+         
+         this.toggleSplash = function() {
+            $('#splash').fadeToggle();
          };
 
       }
