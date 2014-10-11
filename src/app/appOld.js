@@ -46,7 +46,7 @@
                      self.setPlotTime(30);
 
                      // Load complete, show page
-                     $('#splash').fadeOut();
+                     /*$('#splash').fadeOut();*/
                   });
 
                   this.authed = true;
@@ -133,8 +133,8 @@
                   //jQuery('.pulse').addClass('animated bounce');
                   //$('.pulse').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', $('animated bounce').remove());
                   
-                  $('.widget-round').removeClass().addClass('pulse' + ' animated' + ' widget-round').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-                  $(this).removeClass().addClass('widget-round');
+                  $('.logo').removeClass().addClass('pulse' + ' animated' + ' img img-responsive img-center logo').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+                  $(this).removeClass().addClass('img img-responsive img-center logo');
                   });
                   var current = self.data.$getRecord(event.key);
                   if (current.hasOwnProperty('timeStamp')) {

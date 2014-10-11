@@ -25,7 +25,7 @@
 </head>
 
 <body ng-controller="PowerController as pwrCtrl">
-  <div id="splash" class="jumbotron">
+  <div id="splash" class="jumbotron" ng-show="!pwrCtrl.authed">
     <div class="container mainSplash">
       <div class="col-md-2 "></div>
 
@@ -47,25 +47,27 @@
           <label for="exampleInputEmail2">Re-type password</label>
           <input type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Re-type Password">
         </div>
-        <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-click="authCtrl.createUser(); authCtrl.credentials.newUser = !authCtrl.credentials.newUser;"><span class="glyphicon glyphicon-log-out"> Create User</span>
+        <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-cloak ng-click="authCtrl.createUser(); authCtrl.credentials.newUser = !authCtrl.credentials.newUser;"><span class="glyphicon glyphicon-log-out"> Create User</span>
         </button>
-        <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
-          <button ng-show="pwrCtrl.authed" type="" class="btn bnt-login" ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
+        <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-cloak ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
+          <button ng-show="pwrCtrl.authed" type="" class="btn bnt-login" ng-cloak ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
           </button>
       </div>
 
     </div>
   </div>
-
-<!--  <div class="jumbotron logoTron">
+<div class="mainsite" ng-show="pwrCtrl.authed">
+  <div class="jumbotron logoTron">
     <div class="container">
       <div class="row">
         <img src="assets/logo.png" class="img img-responsive img-center logo">
       </div>
     </div>
-  </div>-->
+  </div>
+  
 
-  <div class="navbar navbar-default navbar-inverse navbar-fixed-top specialMenu" ng-show="pwrCtrl.authed" ng-cloak role="navigation">
+
+  <div class="navbar navbar-fixed-top specialMenu" ng-show="pwrCtrl.authed" ng-cloak role="navigation">
       <div class="container">
               <div class="navbar-center"></div>
 
@@ -76,7 +78,6 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#"><img src="assets/logo.png" class="img logo"></a>
         </div>
         
         <div class="navbar-collapse collapse">
@@ -97,8 +98,8 @@
               </ul>
             </li>
           </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="../navbar/">Logout</a></li>
+          <ul class="nav navbar-nav navbar-right" ng-controller="AuthController as authCtrl">
+            <li><a href="" ng-click="authCtrl.logout();">Logout</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -146,27 +147,18 @@
     </div>
   </div>-->
     
-  </div>
-  
+
   <div class="jumbotron" id="stats">
-
-  
-  <div class="container">
-  
- 
-  
-    <div class="row">
-      <div class="btn-group chartButtons" ng-init="range = 4">
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(0); range = 1" ng-class="{selected:range === 1}">All Data</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2" ng-class="{selected:range === 2}">Last 24 hours</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3" ng-class="{selected:range === 3}">Last hour</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4" ng-class="{selected:range === 4}">Last 30 minutes</button>
-        <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(5); range = 5" ng-class="{selected:range === 5}">Last 5 minutes</button>
-      </div>
-</div>
-
-
-
+    <div class="container">
+      <div class="row">
+        <div class="btn-group chartButtons" ng-init="range = 4">
+          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(0); range = 1" ng-class="{selected:range === 1}">All Data</button>
+          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2" ng-class="{selected:range === 2}">Last 24 hours</button>
+          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3" ng-class="{selected:range === 3}">Last hour</button>
+          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4" ng-class="{selected:range === 4}">Last 30 minutes</button>
+          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(5); range = 5" ng-class="{selected:range === 5}">Last 5 minutes</button>
+        </div>
+    </div>
     <div class="col-xs-6 col-md-3">
       <div class="widget widget-rect">
         <h5>Current Usage</h5>
@@ -181,57 +173,21 @@
         <p>kWh</p>
       </div>
     </div>
-
     <div class="col-xs-6 col-md-3">
       <div class="widget widget-rect">
-        <h5>Current Usage</h5>
-        <h2>{{pwrCtrl.totalUsage}}</h2>
-        <p>kWh</p>
-      </div>
-    </div>
-    
-    <div class="col-xs-6 col-md-3">
-      <div class="widget widget-rect">
-        <h5>Current Usage</h5>
-        <h2>{{pwrCtrl.totalUsage}}</h2>
-        <p>kWh</p>
-      </div>
-    </div>
-
-    <div class="col-xs-6 col-md-3">
-      <div class="widget widget-rect">
-        <h5>Current Usage</h5>
-        <h2>{{pwrCtrl.totalUsage}}</h2>
-        <p>kWh</p>
-      </div>
-    </div>
-
-    <div class="col-xs-6 col-md-3">
-      <div class="widget widget-rect">
-        <h5>Current Usage</h5>
-        <h2>{{pwrCtrl.currentPrice}}</h2>
+        <h5>Total Price</h5>
+        <h2>{{pwrCtrl.totalUsage/1000 * pwrCtrl.currentPrice | number: 2}}</h2>
         <p>DKK</p>
       </div>
     </div>
-     
-     <div class="col-xs-6 col-md-3" ng-show="pwrCtrl.currentPrice">
-      <div class="widget widget-rect">
-        <h5>Current Usage</h5>
-        <h2>{{pwrCtrl.currentPrice}}</h2>
-        <p>DKK</p>
-      </div>
-    </div>
-    
     <div class="col-xs-6 col-md-3">
-      <div class="widget widget-rect">
-        <h5>Current Usage</h5>
-        <h2>{{pwrCtrl.currentPrice}}</h2>
-        <p>DKK</p>
+      <div class="widget widget-rect disabled">
+        <h5>Add widget</h5>
+        <p ng-click="pwrCtrl.addWidget()">+</p>       
       </div>
     </div>
-    
   </div>
-    </div>
+</div>
 
   
   
@@ -285,7 +241,7 @@
     </div>
   </div>
 
-
+</div>
   <!--  <div class="tabs-striped tabs-background-positive tabs-light">
     <div class="tabs">
       <a class="tab-item active" href="#">
@@ -337,11 +293,11 @@
 
 <script>
 $(window).scroll(function() {
-if ($(document).scrollTop() > 150) {
-$('.specialMenu').addClass('shrink');
+if ($(document).scrollTop() > 50) {
+$('.logo').addClass('shrink');
 }
 else {
-$('.specialMenu').removeClass('shrink'); }
+$('.logo').removeClass('shrink'); }
 });
 </script>
 

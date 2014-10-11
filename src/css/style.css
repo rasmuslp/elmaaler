@@ -4,7 +4,24 @@
 
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
 
+
+
+
 @import url(http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic);
+
+@media (max-width: 480px) {
+
+	.container{
+		width: 100%;
+		padding: 0px;
+		margin: 0 auto;
+	}
+	
+	.jumbotron {
+		padding: 0px;
+	}
+}
+
 .container {
 }
 
@@ -27,6 +44,13 @@ body {
 
 .logo {
     transition: all 0.4s ease;
+    width: 100px;
+    height: auto;
+	padding-top: 50px;
+}
+
+.logo.shrink{
+
 }
 
 
@@ -51,11 +75,24 @@ body {
 .specialMenu img{
 	height: 100px;
 	width: auto;
+	
 }
 
 .specialMenu {
 	margin-bottom: 40px;
 	display: inline-block;
+	background-color: #white;
+	background-color: #6ad1e6;
+	border-bottom: 1px dashed #fff;
+	
+}
+
+.adminPanel {
+	display: none;
+}
+
+.specialMenu *{
+	color: white;
 }
 
 .loginBox label{
@@ -76,9 +113,52 @@ body {
 	margin-top: 3px;
 }
 
+.nav li a:hover {
+	background-color: #fff;
+	color: #6ad1e6;
+	
+}
+
+.navbar-header {
+}
+
+.nav li a {
+		background-color: #6ad1e6;
+		transition: all 0.4s ease;
+}
+
+.navbar-toggle {
+	background-color: white;
+	border-radius: 0;
+}
 
 .widget {
 		text-align: center;
+		height: 120px;
+}
+
+.widget.disabled h5{
+	background-color: #dfdfdf;
+}
+
+.widget.disabled p {
+	font-size: 100px;
+	margin-top: 17px;
+	cursor: pointer;
+	color: #dfdfdf;
+	transition: all 0.4s ease;
+}
+
+.widget.disabled p:hover {
+	font-size: 100px;
+	margin-top: 17px;
+	cursor: pointer;
+	color: #6ad1e6;
+}
+
+
+
+.widget.disabled img {
 }
 
 .widget-round {
@@ -101,6 +181,7 @@ body {
 .widget-rect {
 		background-color: #fff;
 		padding: 0px;
+		text-align: ;
 		border-radius: 10px;
 		
 }
@@ -117,6 +198,8 @@ body {
 	padding: 10px;
 	padding-bottom: 0px;
 	margin: 0px;
+	color: #b1b1b1;
+	font-weight: lighter;
 }
 
 .widget p{
@@ -171,47 +254,14 @@ body {
 	
 }
 
-.navbar-brand img{
-	height: inherit;
-	margin-top: -15px;
-	height: 50px;
-	
-}
-
-.navbar-inverse { background-color: #6AD1E6}
-.navbar-inverse .navbar-nav>.active>a:hover,.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus { background-color: #6AD1E6}
-.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.open>a,.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover,.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover, .navbar-inverse .navbar-nav>.open>a:focus { background-color: #FFFFFF}
-.dropdown-menu { background-color: #FFFFFF}
-.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus { background-color: #6AD1E6}
-.navbar-inverse { background-image: none; }
-.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus { background-image: none; }
-.navbar-inverse { border-color: #FFFFFF}
-.navbar-inverse .navbar-brand { color: #FFFFFF}
-.navbar-inverse .navbar-brand:hover { color: #FFFFFF}
-.navbar-inverse .navbar-nav>li>a { color: #FFFFFF}
-.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus { color: #FFFFFF}
-.navbar-inverse .navbar-nav>.active>a,.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover, .navbar-inverse .navbar-nav>.open>a:focus { color: #6AD1E6}
-.navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus { color: #6AD1E6}
-.dropdown-menu>li>a { color: #6AD1E6}
-.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus { color: #FFFFFF}
-.navbar-inverse .navbar-nav>.dropdown>a .caret { border-top-color: #FFFFFF}
-.navbar-inverse .navbar-nav>.dropdown>a:hover .caret { border-top-color: #FFFFFF}
-.navbar-inverse .navbar-nav>.dropdown>a .caret { border-bottom-color: #FFFFFF}
-.navbar-inverse .navbar-nav>.dropdown>a:hover .caret { border-bottom-color: #FFFFFF}
-
-
-.navbar li.active{
-
-}
-
-
 .jumbotron#stats {
-	background-color: #ededed;
-	margin-top: 50px;
+	background-color: #f6f6f6;
+	margin-bottom: 0px;	
 }
 
 .jumbotron#graph {
-		background-color: #fff;
+		background-color: #ededed;
+		border-top: 1px dashed #fff;
 	
 }
 
@@ -220,6 +270,10 @@ body {
 	height: 2px;
 	padding: 0px;
 
+}
+
+.domain path {
+	fill: none;
 }
 
 .jumbotron#pulse .widget-round{
@@ -236,7 +290,6 @@ body {
     margin-bottom: 0px;
 }
 
-
 .chartButtons {
 	margin: 0 auto;
 }
@@ -251,11 +304,11 @@ body {
 	color: #6ad1e6;
 	margin-bottom: 20px;
   transition: all 0.4s ease;
-  border: 1px solid #6ad1e6;
+  background-color: #fff;
 }
 
 .btn-chart:hover {
-	background-color: white;
+	background-color: #ebebeb;
 	color: #6ad1e6;
 }
 
