@@ -172,8 +172,8 @@
                         var diff = newUsage - self.currentUsage;
                         if (Math.abs(diff) > (self.currentUsage * 0.10)) {
                            // Edge
-                           self.edgeInProgress.push(newUsage);
-                           console.log('Edge detected: ' + newUsage);
+                           self.edgeInProgress.push(self.currentUsage);
+                           console.log('Edge detected: ' + self.currentUsage + 'W to ' + newUsage + 'W');
                         }
                         else if (self.edgeInProgress.length > 0) {
                            console.log('Edge might have ended?');
@@ -193,7 +193,7 @@
                               }
                               else {
                                  // Rising edge still rising
-                                 self.edgeInProgress.push(newUsage);
+                                 self.edgeInProgress.push(self.currentUsage);
                                  console.log('Rising edge still rising');
                                  return;
                               }
@@ -207,7 +207,7 @@
                               }
                               else {
                                  // Falling edge still falling
-                                 self.edgeInProgress.push(newUsage);
+                                 self.edgeInProgress.push(self.currentUsage);
                                  console.log('Falling edge still falling');
                                  return;
                               }
