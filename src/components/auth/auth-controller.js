@@ -1,6 +1,6 @@
-'use strict';
-
 (function() {
+    'use strict';
+
     angular.module('moras.auth.controller', ['moras.auth.service'])
         .controller('AuthController', ['AuthService',
             function(AuthService) {

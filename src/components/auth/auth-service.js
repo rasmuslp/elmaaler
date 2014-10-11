@@ -1,6 +1,6 @@
-'use strict';
-
 (function() {
+    'use strict';
+
     angular.module('moras.auth.service', ['moras.config', 'firebase'])
         .factory('AuthService', ['FB_URI', '$firebase',
             function(FB_URI, $firebase) {

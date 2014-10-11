@@ -1,6 +1,6 @@
-'use strict';
-
 (function() {
+    'use strict';
+
    var awareApp = angular.module('awareAppOld', ['firebase', 'moras.config', 'moras.auth', 'aware.admin', 'aware.dashboard', 'n3-line-chart']);
 
    awareApp.controller('PowerController', ['$firebase', 'DataService', 'DatametaService', 'FB_URI',
@@ -75,7 +75,7 @@
                y: {
                   min: 0,
                   labelFunction: function(value) {
-                     return value + ' W'
+                     return value + ' W';
                   }
                }
             },
@@ -100,7 +100,7 @@
          };
 
          this.setPlotTime = function(minutes) {
-            minutes = parseInt(minutes || 0);
+            minutes = parseInt(minutes || 0, 10);
             var oldMinutes = this.plotMinutes || 0;
             if (minutes === oldMinutes) {
                return;
@@ -114,7 +114,7 @@
 
             // Trim what is needed
             this.trimPlotToInterval();
-         }
+        };
 
          this.changeDataset = function() {
             if (typeof this.data !== 'undefined') {
@@ -132,10 +132,11 @@
                if (event.event === 'child_added') {
                   //jQuery('.pulse').addClass('animated bounce');
                   //$('.pulse').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', $('animated bounce').remove());
-                  
+
                   $('.logo').removeClass().addClass('pulse' + ' animated' + ' img img-responsive img-center logo').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-                  $(this).removeClass().addClass('img img-responsive img-center logo');
+                      $(this).removeClass().addClass('img img-responsive img-center logo');
                   });
+                  
                   var current = self.data.$getRecord(event.key);
                   if (current.hasOwnProperty('timeStamp')) {
                      // Device restarted, new series beginning.
@@ -164,11 +165,14 @@
                      if (self.correctorEnabled) {
                         // TODO: NB: Corrector might not work with new data format :<
 
+                        var lastVerifiedUsage;
+                        var diff;
+
                         if (self.unverfiedUsage) {
                            // Comparison of current usage vs last unverified usage
 
-                           var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
-                           var diff = Math.abs(usage - lastVerifiedUsage);
+                           lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
+                           diff = Math.abs(usage - lastVerifiedUsage);
                            if (diff > 0.05 * lastVerifiedUsage) {
                               console.log('Alright, load must have changed');
                               self.addDataToPlot(prev, self.unverfiedUsage);
@@ -183,8 +187,8 @@
                         else {
                            if (self.plotData.length > 1) {
                               // Comparison of current usage vs last verified usage
-                              var lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
-                              var diff = Math.abs(usage - lastVerifiedUsage);
+                              lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
+                              diff = Math.abs(usage - lastVerifiedUsage);
                               if (diff > 0.05 * lastVerifiedUsage) {
                                  // Max 10% diff filter
                                  console.log('Diff to big, not verified');
@@ -193,7 +197,7 @@
                               }
                            }
                         }
-                     } // end-if self.correctorEnabled 
+                     } // end-if self.correctorEnabled
 
                      self.addDataToPlot(current, usage);
                   }

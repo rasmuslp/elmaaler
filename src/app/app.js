@@ -1,5 +1,5 @@
-'use strict';
-
 (function() {
-   var awareApp = angular.module('awareApp', ['awareAppOld']);
+    'use strict';
+
+    angular.module('awareApp', ['awareAppOld']);
 }());

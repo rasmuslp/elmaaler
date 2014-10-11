@@ -1,12 +1,12 @@
-'use strict';
-
 (function() {
+    'use strict';
+
     var adminController = angular.module('aware.admin.controller', ['aware.dashboard.data.service', 'aware.dashboard.datameta.service']);
     adminController.controller('AdminController', ['DataService', 'DatametaService', function(DataService, DatametaService){
         this.toggleSplash = function() {
             $('#splash').fadeToggle();
          };
-         
+
           this.saveDataset = function() {
             var self = this;
 
@@ -42,13 +42,13 @@
                }).then(function(data_meta_ref) {
                   self.selectedDataset = self.dataMeta.$getRecord(data_meta_ref.name());
                   self.changeDataset();
-               })
+               });
                self.newDataset.title = '';
 
             });
          };
-         
-         
+
+
     }]);
-    
+
 }());

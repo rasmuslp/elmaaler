@@ -1,6 +1,6 @@
-'use strict';
-
 (function() {
+    'use strict';
+
     angular.module('aware.dashboard.data.service', ['moras.config', 'firebase'])
         .factory('DataService', ['FB_URI', '$firebase',
             function(FB_URI, $firebase) {
