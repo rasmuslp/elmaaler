@@ -16,7 +16,7 @@
 		padding: 0px;
 		margin: 0 auto;
 	}
-
+	
 	.jumbotron {
 		padding: 0px;
 	}
@@ -75,20 +75,20 @@ body {
 .specialMenu img{
 	height: 100px;
 	width: auto;
-
+	
 }
 
 .specialMenu {
 	margin-bottom: 40px;
 	display: inline-block;
-	background-color: #white;
+	background-color: white;
 	background-color: #6ad1e6;
 	border-bottom: 1px dashed #fff;
-
+	
 }
 
 .adminPanel {
-	display: none;
+	display:block;
 }
 
 .specialMenu *{
@@ -116,7 +116,7 @@ body {
 .nav li a:hover {
 	background-color: #fff;
 	color: #6ad1e6;
-
+	
 }
 
 .navbar-header {
@@ -170,7 +170,7 @@ body {
 	margin: 0 auto;
 	margin-top: -125px;
 	border: 2px solid white;
-	color: white;
+	color: white;	
 }
 
 .widget-round h2{
@@ -181,9 +181,8 @@ body {
 .widget-rect {
 		background-color: #fff;
 		padding: 0px;
-		text-align: ;
 		border-radius: 10px;
-
+		
 }
 
 .widget h5 {
@@ -192,7 +191,7 @@ body {
 	color: #fff;
 	text-transform: uppercase;
 	margin-bottom: 0px;
-
+	
 }
 .widget h2 {
 	padding: 10px;
@@ -230,7 +229,7 @@ body {
 .text {
 	width: 700px;
 	transition: all 0.4s ease;
-
+	
 }
 
 .vcenter {
@@ -251,17 +250,18 @@ body {
 	font-weight: bold;
 	background-color: #fff;
 	color: #14697a;
-
+	
 }
 
 .jumbotron#stats {
 	background-color: #f6f6f6;
-	margin-bottom: 0px;
+	margin-bottom: 0px;	
 }
 
 .jumbotron#graph {
-	background-color: #ededed;
-	border-top: 1px dashed #fff;
+		background-color: #ededed;
+		border-top: 1px dashed #fff;
+	
 }
 
 .jumbotron#pulse {

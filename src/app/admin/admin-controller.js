@@ -1,8 +1,8 @@
 (function() {
     'use strict';
 
-    var adminController = angular.module('aware.admin.controller', ['aware.dashboard.data.service', 'aware.dashboard.datameta.service']);
-    adminController.controller('AdminController', ['DataService', 'DatametaService', function(DataService, DatametaService){
+    var adminController = angular.module('aware.admin.controller', ['firebase', 'aware.dashboard.data.service', 'aware.dashboard.datameta.service']);
+    adminController.controller('AdminController', ['$firebase', 'DataService', 'DatametaService', function($firebase, DataService, DatametaService){
         this.toggleSplash = function() {
             $('#splash').fadeToggle();
          };
@@ -29,18 +29,18 @@
             }, currentData);
 
             // Remove incoming data
-            $firebase(new Firebase(FB_URI + 'device/23436f3643fc42ee/' + '/data/incoming')).$remove();
+            $firebase(new Firebase('https://elmaaler.firebaseio.com/' + 'device/23436f3643fc42ee/' + '/data/incoming')).$remove();
             //TODO: Insert newest timestamp at head of raw data
 
             // Save current data
-            $firebase(new Firebase(FB_URI + 'device/23436f3643fc42ee/' + 'data/')).$push({
+            $firebase(new Firebase('https://elmaaler.firebaseio.com/' + 'device/23436f3643fc42ee/' + 'data/')).$push({
                raw: currentData
-            }).then(function(data_ref) {
+            }).then(function(dataRef) {
                DatametaService.data.$add({
                   title: self.newDataset.title,
-                  data_id: data_ref.name()
-               }).then(function(data_meta_ref) {
-                  self.selectedDataset = self.dataMeta.$getRecord(data_meta_ref.name());
+                  dataId: dataRef.name()
+               }).then(function(datametaRef) {
+                  self.selectedDataset = self.dataMeta.$getRecord(datametaRef.name());
                   self.changeDataset();
                });
                self.newDataset.title = '';
