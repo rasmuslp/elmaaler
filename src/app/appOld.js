@@ -35,7 +35,7 @@
                   DatametaService.setup(this.device);
                   this.dataMeta = DatametaService.data();
                   // Initialse data
-                  this.dataMeta.$loaded().then(function(dataMeta) {
+                  this.dataMeta.$loaded().then(function() {
                      self.dataMeta.unshift({
                         dataId: 'incoming',
                         title: 'Live'
@@ -57,9 +57,6 @@
                this.authed = false;
             }
          }, this);
-
-         // For the correction algo in the $watch
-         var unverfiedUsage = false;
 
          this.rawDataErrorCorrectorEnabled = true;
          this.deviceIdentifierEnabled = true;
@@ -93,7 +90,7 @@
             tooltip: {
                mode: 'scrubber',
                formatter: function(x, y, series) {
-                  return y + ' W at ' + x + ' s';
+                  return y + ' ' + series.label + ' at ' + x + ' s';
                }
             },
             drawLegend: false,

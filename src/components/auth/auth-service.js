@@ -3,7 +3,7 @@
 
     angular.module('moras.auth.service', ['moras.config', 'firebase'])
         .factory('AuthService', ['FB_URI', '$firebase',
-            function(FB_URI, $firebase) {
+            function(FB_URI) {
                 var ref = new Firebase(FB_URI);
                 var ret = {};
 
@@ -38,7 +38,7 @@
                         password: credentials.password
                     }, function(error, authData) {
                         if (error) {
-                            console.log('Error loging in. Unknown error: %o', error);
+                            console.log('Error logging in. Unknown error: %o', error);
                         }
                         else {
                             console.log('User successfully logged in: %o', authData);
@@ -49,6 +49,7 @@
                 };
 
                 ret.logout = function() {
+                    console.log('Logging out. See you soon!');
                     ref.unauth();
                 };
 

@@ -1,4 +1,5 @@
 module.exports = function ( grunt ) {
+    'use strict';
 
     /**
     * Load required Grunt tasks. These are installed based on the versions listed
@@ -24,7 +25,7 @@ module.exports = function ( grunt ) {
         * We read in our `package.json` file so we can access the package name and
         * version. It's already there, so we don't repeat ourselves here.
         */
-        pkg: grunt.file.readJSON("package.json"),
+        pkg: grunt.file.readJSON('package.json'),
 
         /**
         * The banner is the comment that is placed at the top of our compiled
@@ -58,14 +59,14 @@ module.exports = function ( grunt ) {
         bump: {
             options: {
                 files: [
-                "package.json",
-                "bower.json"
+                'package.json',
+                'bower.json'
                 ],
                 commit: false,
                 commitMessage: 'chore(release): v%VERSION%',
                 commitFiles: [
-                "package.json",
-                "client/bower.json"
+                'package.json',
+                'client/bower.json'
                 ],
                 createTag: false,
                 tagName: 'v%VERSION%',
@@ -100,7 +101,7 @@ module.exports = function ( grunt ) {
                 }
                 ]
             },
-            build_app_assets: {
+            buildAppAssets: {
                 files: [
                 {
                     src: [ '**' ],
@@ -110,7 +111,7 @@ module.exports = function ( grunt ) {
                 }
                 ]
             },
-            build_vendor_assets: {
+            buildVendorAssets: {
                 files: [
                 {
                     src: [ '<%= vendor_files.assets %>' ],
@@ -121,7 +122,7 @@ module.exports = function ( grunt ) {
                 }
                 ]
             },
-            build_appjs: {
+            buildAppJs: {
                 files: [
                 {
                     src: [ '<%= app_files.js %>' ],
@@ -131,7 +132,7 @@ module.exports = function ( grunt ) {
                 }
                 ]
             },
-            build_vendorjs: {
+            buildVendorJs: {
                 files: [
                 {
                     src: [ '<%= vendor_files.js %>' ],
@@ -141,7 +142,7 @@ module.exports = function ( grunt ) {
                 }
                 ]
             },
-            build_vendorcss: {
+            buildVendorCss: {
                 files: [
                 {
                     src: [ '<%= vendor_files.css %>' ],
@@ -151,7 +152,7 @@ module.exports = function ( grunt ) {
                 }
                 ]
             },
-            compile_assets: {
+            compileAssets: {
                 files: [
                 {
                     src: [ '**' ],
@@ -174,10 +175,10 @@ module.exports = function ( grunt ) {
         */
         concat: {
             /**
-            * The `build_css` target concatenates compiled CSS and vendor CSS
+            * The `buildCss` target concatenates compiled CSS and vendor CSS
             * together.
             */
-            build_css: {
+            buildCss: {
                 src: [
                 '<%= vendor_files.css %>',
                 '<%= build_dir %>/assets/<%= pkg.name %>-<%= pkg.version %>.css'
@@ -185,10 +186,10 @@ module.exports = function ( grunt ) {
                 dest: '<%= build_dir %>/assets/<%= pkg.name %>-<%= pkg.version %>.css'
             },
             /**
-            * The `compile_js` target is the concatenation of our application source
+            * The `compileJs` target is the concatenation of our application source
             * code and all specified vendor source code into a single file.
             */
-            compile_js: {
+            compileJs: {
                 options: {
                     banner: '<%= meta.banner %>'
                 },
@@ -233,7 +234,7 @@ module.exports = function ( grunt ) {
                     banner: '<%= meta.banner %>'
                 },
                 files: {
-                    '<%= concat.compile_js.dest %>': '<%= concat.compile_js.dest %>'
+                    '<%= concat.compileJs.dest %>': '<%= concat.compileJs.dest %>'
                 }
             }
         },
@@ -346,7 +347,7 @@ module.exports = function ( grunt ) {
             compile: {
                 dir: '<%= compile_dir %>',
                 src: [
-                '<%= concat.compile_js.dest %>',
+                '<%= concat.compileJs.dest %>',
                 '<%= vendor_files.css %>',
                 '<%= build_dir %>/assets/<%= pkg.name %>-<%= pkg.version %>.css'
                 ]
@@ -394,7 +395,7 @@ module.exports = function ( grunt ) {
                 files: [
                 '<%= app_files.js %>'
                 ],
-                tasks: [ 'jshint:src', 'copy:build_appjs' ]
+                tasks: [ 'jshint:src', 'copy:buildAppJs' ]
             },
 
             /**
@@ -405,7 +406,7 @@ module.exports = function ( grunt ) {
                 files: [
                 'src/assets/**/*'
                 ],
-                tasks: [ 'copy:build_app_assets', 'copy:build_vendor_assets' ]
+                tasks: [ 'copy:buildAppAssets', 'copy:buildVendorAssets' ]
             },
 
             /**
@@ -481,8 +482,8 @@ module.exports = function ( grunt ) {
     */
     grunt.registerTask( 'build', [
     'clean', 'html2js', 'jshint', 'less:build', 'copy:buildAppCss',
-    'concat:build_css', 'copy:build_app_assets', 'copy:build_vendor_assets',
-    'copy:build_appjs', 'copy:build_vendorjs', 'copy:build_vendorcss', 'index:build',
+    'concat:buildCss', 'copy:buildAppAssets', 'copy:buildVendorAssets',
+    'copy:buildAppJs', 'copy:buildVendorJs', 'copy:buildVendorCss', 'index:build',
     ]);
 
     /**
@@ -490,7 +491,7 @@ module.exports = function ( grunt ) {
     * minifying your code.
     */
     grunt.registerTask( 'compile', [
-    'less:compile', 'copy:compile_assets', 'ngAnnotate', 'concat:compile_js', 'uglify', 'index:compile'
+    'less:compile', 'copy:compileAssets', 'ngAnnotate', 'concat:compileJs', 'uglify', 'index:compile'
     ]);
     
     grunt.registerTask( 'travis', [ 'build' ]);
@@ -529,7 +530,7 @@ module.exports = function ( grunt ) {
         });
 
         grunt.file.copy('src/index.html', this.data.dir + '/index.html', {
-            process: function ( contents, path ) {
+            process: function ( contents ) {
                 return grunt.template.process( contents, {
                     data: {
                         scripts: jsFiles,
