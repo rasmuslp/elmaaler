@@ -5,7 +5,7 @@
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
 
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
-
+<link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
 @media (max-width: 480px) {
 
 	.container{
@@ -348,7 +348,6 @@ body {
 }
 
 .widget {
-  height: 400px;
 }
 
 .widget .turnedOn {
@@ -367,6 +366,7 @@ body {
 
 
 
+
 .widget .turnedOff {
 	width: 20px;
 	height: 20px;
@@ -381,12 +381,33 @@ body {
 	
 }
 
+.popOver {
+	position: absolute;
+	z-index: 999;
+	background-color: #fff;
+	padding: 10px;
+	-webkit-box-shadow: 0px 0px 3px 5px #333;
+	-moz-box-shadow: 0px 0px 3px 5px #333;
+	box-shadow: 0px 0px 10px 3px #aaa; 
+	transition: all 0.4s ease;
+}
+
+
+
 .ledIndicator {
 	display: inline-block;
 	float: left;
 	display: block;
-	margin: 6px;
+	margin: 10px;
+}
 
+
+.ledIndicator .turnedOn {
+	float: left;
+}
+
+.ledIndicator .turnedOff {
+	float: left;
 }
 
 .jumbotron#stats {

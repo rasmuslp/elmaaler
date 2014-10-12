@@ -111,15 +111,18 @@
           <div class="widget widget-rect" ng-class="{active: device.active}">
             <div class="widget-heading"><h5>{{device.title}} <button ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart btn-sm" ng-show="pwrCtrl.authed"><span class="glyphicon glyphicon-trash"></span></button></h5></div>
             <h2>{{device.usage}} W</h2>
-            <p ng-class="{turnedOn: device.active, turnedOff: !device.active}" class="turnedOn" ng-click="device.active = !device.active"></p>
+            <p ng-class="{turnedOn: device.active, turnedOff: !device.active}" ng-click="device.active = !device.active" ng-mouseover="device.isActive = true" ng-mouseleave="device.isActive = false"></p>
             <br/>
-              <div class="ledIndicator" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom" ng-repeat="date in device.stateChangeDates"><p ng-class="{turnedOn: date.on, turnedOff: !date.off}" class="turnedOn"></p></div>
+            <div class="popOver" ng-show="device.isActive">
+            
+              <div class="ledIndicator" ng-repeat="stateChange in device.stateChangeDates"><p ng-class="{turnedOn: stateChange.on && !stateChange.off, turnedOff: stateChange.off}"></p><span>On time: {{stateChange.on | date:'HH:mm:ss'}} <br />Off time: {{stateChange.off | date: 'HH:mm:ss'}}<span></div>
+            </div>
           </div>
           </div>
     </div>
   </div>
 
-  <div class="tabTron" style="display:none">
+<!--  <div class="tabTron" style="display:none">
     <div class="tabContainer">
       <div class="btn-group tabButtons">
         <button type="button" class="btn btn-tab" ng-click="tab = 1" ng-class="{selected:tab === 1}">Why be aware?</button>
@@ -128,7 +131,6 @@
       </div>
       <div class="text" ng-init="tab=1">
         <hr>
-
         <div class="tab-content" ng-show="tab === 1">
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
           in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
@@ -142,7 +144,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div>-->
   <div class="pulse">
     <!--Indication pulse-->
   </div>
@@ -187,6 +189,7 @@
         <p>kWh</p>
       </div>
     </div>
+    
     <div class="col-xs-6 col-md-3">
       <div class="widget widget-rect">
         <h5>Total Price</h5>
@@ -194,6 +197,15 @@
         <p>DKK</p>
       </div>
     </div>
+    
+    <div class="col-xs-6 col-md-3">
+      <div class="widget widget-rect">
+        <h5>Active Devices</h5>
+        <h2>{{pwrCtrl.countActiveDevices}}</h2>
+        <p>STK</p>
+      </div>
+    </div>
+
     <div class="col-xs-6 col-md-3">
       <div class="widget widget-rect disabled">
         <h5>Add widget</h5>
