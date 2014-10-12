@@ -89,6 +89,17 @@ module.exports = function ( grunt ) {
         * `build_dir`, and then to copy the assets to `compile_dir`.
         */
         copy: {
+            buildAppCss: {
+                files: [
+                {
+                    src: [ '<%= app_files.css %>' ],
+                    dest: '<%= build_dir %>/assets/',
+                    cwd: '.',
+                    expand: true,
+                    flatten: true
+                }
+                ]
+            },
             build_app_assets: {
                 files: [
                 {
@@ -322,6 +333,7 @@ module.exports = function ( grunt ) {
                 '<%= html2js.common.dest %>',
                 '<%= html2js.app.dest %>',
                 '<%= vendor_files.css %>',
+                '<%= build_dir %>/assets/*.css',
                 '<%= build_dir %>/assets/<%= pkg.name %>-<%= pkg.version %>.css'
                 ]
             },
@@ -424,6 +436,14 @@ module.exports = function ( grunt ) {
             },
 
             /**
+            * When the CSS files change, we need to copy them.
+            */
+            css: {
+                files: [ 'src/**/*.css' ],
+                tasks: [ 'copy:buildAppCss' ]
+            },
+
+            /**
             * When a JavaScript unit test file changes, we only want to lint it and
             * run the unit tests. We don't want to do any live reloading.
             */
@@ -460,7 +480,7 @@ module.exports = function ( grunt ) {
     * The `build` task gets your app ready to run for development and testing.
     */
     grunt.registerTask( 'build', [
-    'clean', 'html2js', 'jshint', 'less:build',
+    'clean', 'html2js', 'jshint', 'less:build', 'copy:buildAppCss',
     'concat:build_css', 'copy:build_app_assets', 'copy:build_vendor_assets',
     'copy:build_appjs', 'copy:build_vendorjs', 'copy:build_vendorcss', 'index:build',
     ]);
