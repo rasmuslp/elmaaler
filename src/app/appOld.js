@@ -191,7 +191,6 @@
                         return;
                      }
 
-                     self.currentUsage = newUsage;
                      self.addDataToPlot(current, newUsage);
                   }
                   else {
@@ -416,14 +415,16 @@
          };
 
          this.addDataToPlot = function(dataPoint, usage) {
-
+            this.currentUsageChange = this.currentUsage - usage;
+            this.currentUsage = usage;
+            
             var currentDeviceUsage = 0;
             for (var i = 0; i < this.devices.length; i++) {
                if (this.devices[i].active) {
                   currentDeviceUsage += this.devices[i].usage;
                }
             }
-
+         
             console.log('No. registered devices ' + this.devices.length + ' of which ' + this.countActiveDevices() + ' devices are on.');
 
             this.plotData.push({

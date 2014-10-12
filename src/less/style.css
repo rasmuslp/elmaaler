@@ -5,7 +5,7 @@
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
 
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
-<link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic);
 @media (max-width: 480px) {
 
 	.container{
@@ -42,8 +42,7 @@ body {
 .logo {
     transition: all 0.4s ease;
     width: 100px;
-    height: auto;
-	padding-top: 50px;
+		padding-top: 50px;
 }
 
 .logo.shrink{
@@ -357,8 +356,8 @@ body {
 		border-radius: 50%;
 	margin: 0 auto;
 	margin-top: 5px;
-	-webkit-box-shadow: 0px 0px 3px 5px #f2e1f2;
-	-moz-box-shadow: 0px 0px 3px 5px #f2e1f2;
+	-webkit-box-shadow: 0px 0px 3px 5px #e6fbe9;
+	-moz-box-shadow: 0px 0px 3px 5px #e6fbe9;
 	box-shadow: 0px 0px 3px 5px #e6fbe9;
 	color: #e6fbe9;
 	transition: all 0.4s ease;
@@ -383,16 +382,24 @@ body {
 
 .popOver {
 	position: absolute;
-	z-index: 999;
 	background-color: #fff;
 	padding: 10px;
+	width: 660px;
 	-webkit-box-shadow: 0px 0px 3px 5px #333;
 	-moz-box-shadow: 0px 0px 3px 5px #333;
 	box-shadow: 0px 0px 10px 3px #aaa; 
 	transition: all 0.4s ease;
+	z-index: 9999;
 }
 
-
+.popOver span{
+	margin-left: 40px;
+	text-align: left;
+	padding: 0px;
+	display: block;
+	width: 150px;
+	color: gray;
+}
 
 .ledIndicator {
 	display: inline-block;
@@ -402,12 +409,35 @@ body {
 }
 
 
+.currentUsageChange {
+	font-size: 20px;
+	font-weight: bold;
+	transition: all 0.4s ease;
+}
+
+.currentUsageChange.negative{
+	color: #ef7b7b;
+}
+
+.currentUsageChange.negative:before{
+}
+
+.currentUsageChange.posetive:before{
+	content: "+";
+}
+
+
+.currentUsageChange.posetive{
+	color: #9fef7b;
+}
+
 .ledIndicator .turnedOn {
 	float: left;
 }
 
 .ledIndicator .turnedOff {
 	float: left;
+	
 }
 
 .jumbotron#stats {
