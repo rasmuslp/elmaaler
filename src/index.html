@@ -107,12 +107,14 @@
   <div class="jumbotron" id="stats">
     <div class="container">
           <h2 class="text-center">Detected devices</h2>
-          <div class="col-md-2" ng-repeat="device in pwrCtrl.devices" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
+          <div class="col-md-2" ng-repeat="(key, device) in pwrCtrl.devices" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
           <div class="widget widget-rect" ng-class="{active: device.active}">
-            <h5>{{device.title}}</h5>
+            <div class="widget-heading"><h5>{{device.title}} <button ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart pull-right"> <span class="glyphicon glyphicon-trash"></span></button></h5></div>
+              
             <h2>{{device.usage}} W</h2>
             <p ng-show="device.active" class="turnedOn"></p>
             <p ng-hide="device.active" class="turnedOff"></p>
+                
           </div>
           </div>
     </div>

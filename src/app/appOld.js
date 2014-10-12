@@ -355,6 +355,10 @@
                }
             }
          };
+         
+         this.removeDevice = function(deviceId) {
+            this.devices.splice(deviceId, 1);
+         };
 
       }
    ]);

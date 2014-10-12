@@ -492,6 +492,8 @@ module.exports = function ( grunt ) {
     grunt.registerTask( 'compile', [
     'less:compile', 'copy:compile_assets', 'ngAnnotate', 'concat:compile_js', 'uglify', 'index:compile'
     ]);
+    
+    grunt.registerTask( 'travis', [ 'build' ]);
 
     /**
     * A utility function to get all app JavaScript sources.
