@@ -62,8 +62,7 @@
          var unverfiedUsage = false;
 
          this.rawDataErrorCorrectorEnabled = true;
-
-         this.devicesEnabled = true;
+         this.deviceIdentifierEnabled = true;
 
          this.currentPrice = 2.2;
 
@@ -89,7 +88,7 @@
                type: 'area',
                label: 'Watt'
             }],
-            lineMode: 'step-after',
+            lineMode: 'linear',
             tension: 2.7,
             tooltip: {
                mode: 'scrubber',
@@ -168,133 +167,13 @@
 
                      var newUsage = self.calculateUsage(current, prev);
 
-                     if (self.devicesEnabled && self.currentUsage) {
-                        var diff = newUsage - self.currentUsage;
-                        if (Math.abs(diff) > (self.currentUsage * 0.10)) {
-                           // Edge
-                           self.edgeInProgress.push(self.currentUsage);
-                           console.log('Edge detected: ' + self.currentUsage + 'W to ' + newUsage + 'W');
-                        }
-                        else if (self.edgeInProgress.length > 0) {
-                           console.log('Edge might have ended?');
-                           // Edge ended ?
-                           
-                           var deviceUsage = newUsage - self.edgeInProgress[0];
-                           var risingEdge = deviceUsage > 0 ? true : false;
+                     self.deviceIdentifier(newUsage);
 
-                           var TTT = newUsage - self.edgeInProgress[self.edgeInProgress.length - 1];
-
-                           if (risingEdge) {
-                              console.log('Edge is rising');
-                              if (TTT < 0) {
-                                 // Rising edge ended   
-                                 // Do nothing here, just continue with the sweet code below.
-                                 console.log('Edge ended rising, as it just fell');
-                              }
-                              else {
-                                 // Rising edge still rising
-                                 self.edgeInProgress.push(self.currentUsage);
-                                 console.log('Rising edge still rising');
-                                 return;
-                              }
-                           }
-                           else {
-                              console.log('Edge is falling');
-                              if (TTT > 0) {
-                                 // Falling edge ended   
-                                 // Do nothing here, just continue with the sweet code below.
-                                 console.log('Edge ended falling, as it just increased');
-                              }
-                              else {
-                                 // Falling edge still falling
-                                 self.edgeInProgress.push(self.currentUsage);
-                                 console.log('Falling edge still falling');
-                                 return;
-                              }
-                           }
-
-                           deviceUsage = Math.abs(deviceUsage);
-                           var deviceId = null;
-                           console.log('Unidentified device usage: ' + deviceUsage);
-                           console.log('Devices:');
-                           for (var i = 0; i < self.devices.length; i++) {
-                              console.log('Usage: ' + self.devices[i].usage);
-                              console.log('Usage diff: ' + (deviceUsage - self.devices[i].usage));
-                              console.log('Limit: ' + 0.20 * self.devices[i].usage);
-
-                              if (Math.abs((deviceUsage - self.devices[i].usage)) < 0.10 * self.devices[i].usage) {
-                                 // Device match
-                                 console.log('Device match!');
-                                 deviceId = i;
-                                 break;
-                              }
-                           }
-                           if (deviceId === null) {
-                              // New device
-                              var device = {
-                                 title: null,
-                                 active: null,
-                                 usage: deviceUsage,
-                                 totalUsage: 0,
-                                 data: [{
-                                    timeStamp: 0,
-                                    usage: 978
-                                 }, {
-                                    timeStamp: 1,
-                                    usage: 983
-                                 }]
-                              };
-                              self.devices.push(device);
-                              deviceId = self.devices.indexOf(device);
-                              self.devices[deviceId].title = 'Device ' + deviceId;
-                           }
-
-                           if (risingEdge) {
-                              // Rising edge
-                              console.log('Device ' + deviceId + ' turned on with usage ' + deviceUsage + ' W');
-                              self.devices[deviceId].active = true;
-                           }
-                           else {
-                              // Falling edge
-                              console.log('Device ' + deviceId + ' turned off with usage ' + deviceUsage + ' W');
-                              self.devices[deviceId].active = false;
-                           }
-                           self.edgeInProgress = [];
-                        }
+                     var proceed = self.rawDataErrorCorrector(prev, newUsage);
+                     if (!proceed) {
+                        // Waiting to see how load changes (we might have missed a datapoint)
+                        return;
                      }
-
-                     if (self.rawDataErrorCorrectorEnabled) {
-                        var lastVerifiedUsage;
-                        var diff;
-
-                        if (self.unverfiedUsage) {
-                           // Comparison of current usage vs last unverified usage
-
-                           lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
-                           diff = Math.abs(newUsage - lastVerifiedUsage);
-                           if (diff > 0.05 * lastVerifiedUsage) {
-                              self.addDataToPlot(prev, self.unverfiedUsage);
-                           }
-                           else {
-                              self.rawDataErrors++;
-                              console.log('It looks like a datapoint at constant load is missing. Possibly missed points: ' + self.rawDataErrors);
-                              self.addDataToPlot(prev, newUsage);
-                           }
-
-                           self.unverfiedUsage = false;
-                        }
-                        else {
-                           if (self.plotData.length > 1) {
-                              // Comparison of current usage vs last verified usage
-                              lastVerifiedUsage = self.plotData[self.plotData.length - 1].usage;
-                              if (newUsage < lastVerifiedUsage && Math.abs(newUsage * 2 - lastVerifiedUsage) < 0.05 * lastVerifiedUsage) {
-                                 // Caught suspecious data
-                                 self.unverfiedUsage = newUsage;
-                                 return;
-                              }
-                           }
-                        }
-                     } // end-if self.correctorEnabled
 
                      self.currentUsage = newUsage;
                      self.addDataToPlot(current, newUsage);
@@ -311,6 +190,140 @@
             var time = prev.timeDiff - current.timeDiff;
             time = time / 1000.0;
             return Math.round(3600 / time);
+         };
+
+         this.deviceIdentifier = function(usage) {
+            if (this.deviceIdentifierEnabled && this.currentUsage) {
+               var diff = usage - this.currentUsage;
+               if (Math.abs(diff) > (this.currentUsage * 0.10)) {
+                  // Edge
+                  this.edgeInProgress.push(this.currentUsage);
+                  console.log('Edge detected: ' + this.currentUsage + 'W to ' + usage + 'W');
+               }
+               else if (this.edgeInProgress.length > 0) {
+                  console.log('Edge might have ended?');
+                  // Edge ended ?
+
+                  var deviceUsage = usage - this.edgeInProgress[0];
+                  var risingEdge = deviceUsage > 0 ? true : false;
+
+                  var TTT = usage - this.edgeInProgress[this.edgeInProgress.length - 1];
+
+                  if (risingEdge) {
+                     console.log('Edge is rising');
+                     if (TTT < 0) {
+                        // Rising edge ended
+                        // Do nothing here, just continue with the sweet code below.
+                        console.log('Edge ended rising, as it just fell');
+                     }
+                     else {
+                        // Rising edge still rising
+                        this.edgeInProgress.push(this.currentUsage);
+                        console.log('Rising edge still rising');
+                        return;
+                     }
+                  }
+                  else {
+                     console.log('Edge is falling');
+                     if (TTT > 0) {
+                        // Falling edge ended
+                        // Do nothing here, just continue with the sweet code below.
+                        console.log('Edge ended falling, as it just increased');
+                     }
+                     else {
+                        // Falling edge still falling
+                        this.edgeInProgress.push(this.currentUsage);
+                        console.log('Falling edge still falling');
+                        return;
+                     }
+                  }
+
+                  deviceUsage = Math.abs(deviceUsage);
+                  var deviceId = null;
+                  console.log('Unidentified device usage: ' + deviceUsage);
+                  console.log('Devices:');
+                  for (var i = 0; i < this.devices.length; i++) {
+                     console.log('Usage: ' + this.devices[i].usage);
+                     console.log('Usage diff: ' + (deviceUsage - this.devices[i].usage));
+                     console.log('Limit: ' + 0.20 * this.devices[i].usage);
+
+                     if (Math.abs((deviceUsage - this.devices[i].usage)) < 0.10 * this.devices[i].usage) {
+                        // Device match
+                        console.log('Device match!');
+                        deviceId = i;
+                        break;
+                     }
+                  }
+                  if (deviceId === null) {
+                     // New device
+                     var device = {
+                        title: null,
+                        active: null,
+                        usage: deviceUsage,
+                        totalUsage: 0,
+                        data: [{
+                           timeStamp: 0,
+                           usage: 978
+                        }, {
+                           timeStamp: 1,
+                           usage: 983
+                        }]
+                     };
+                     this.devices.push(device);
+                     deviceId = this.devices.indexOf(device);
+                     this.devices[deviceId].title = 'Device ' + deviceId;
+                  }
+
+                  if (risingEdge) {
+                     // Rising edge
+                     console.log('Device ' + deviceId + ' turned on with usage ' + deviceUsage + ' W');
+                     this.devices[deviceId].active = true;
+                  }
+                  else {
+                     // Falling edge
+                     console.log('Device ' + deviceId + ' turned off with usage ' + deviceUsage + ' W');
+                     this.devices[deviceId].active = false;
+                  }
+                  this.edgeInProgress = [];
+               }
+            }
+         };
+
+         this.rawDataErrorCorrector = function(prev, usage) {
+            if (this.rawDataErrorCorrectorEnabled) {
+               var lastVerifiedUsage;
+               var diff;
+
+               if (this.unverfiedUsage) {
+                  // Comparison of current usage vs last unverified usage
+
+                  lastVerifiedUsage = this.plotData[this.plotData.length - 1].usage;
+                  diff = Math.abs(usage - lastVerifiedUsage);
+                  if (diff > 0.05 * lastVerifiedUsage) {
+                     this.addDataToPlot(prev, this.unverfiedUsage);
+                  }
+                  else {
+                     this.rawDataErrors++;
+                     console.log('It looks like a datapoint at constant load is missing. Possibly missed points: ' + this.rawDataErrors);
+                     this.addDataToPlot(prev, usage);
+                  }
+
+                  this.unverfiedUsage = false;
+               }
+               else {
+                  if (this.plotData.length > 1) {
+                     // Comparison of current usage vs last verified usage
+                     lastVerifiedUsage = this.plotData[this.plotData.length - 1].usage;
+                     if (usage < lastVerifiedUsage && Math.abs(usage * 2 - lastVerifiedUsage) < 0.05 * lastVerifiedUsage) {
+                        // Caught suspecious data
+                        this.unverfiedUsage = usage;
+                        return false;
+                     }
+                  }
+               }
+            }
+
+            return true;
          };
 
          this.addDataToPlot = function(dataPoint, usage) {

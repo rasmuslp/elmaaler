@@ -106,11 +106,15 @@
 
   <div class="jumbotron" id="stats">
     <div class="container">
-          <div class="widget widget-rect col-md-2" ng-class="{active: device.active}" ng-repeat="device in pwrCtrl.devices">
-            <h4>{{device.title}}</h4>
-            <p>{{device.active}}</p>
-            <p>{{device.usage}}</p>
-      </div>
+          <h2 class="text-center">Detected devices</h2>
+          <div class="col-md-2" ng-repeat="device in pwrCtrl.devices" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
+          <div class="widget widget-rect" ng-class="{active: device.active}">
+            <h5>{{device.title}}</h5>
+            <h2>{{device.usage}} W</h2>
+            <p ng-show="device.active" class="turnedOn"></p>
+            <p ng-hide="device.active" class="turnedOff"></p>
+          </div>
+          </div>
     </div>
   </div>
 
@@ -157,6 +161,7 @@
 
   <div class="jumbotron" id="stats">
     <div class="container">
+      <h2 class="text-center">Stats</h2>
       <div class="row">
         <div class="btn-group chartButtons" ng-init="range = 4">
           <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(0); range = 1" ng-class="{selected:range === 1}">All Data</button>

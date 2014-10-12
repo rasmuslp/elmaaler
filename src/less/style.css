@@ -4,11 +4,6 @@
 
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
 
-
-
-
-@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic);
-
 @media (max-width: 480px) {
 
 	.container{
@@ -88,7 +83,7 @@ body {
 }
 
 .adminPanel {
-	display:block;
+	display:none !important;
 }
 
 .specialMenu *{
@@ -314,4 +309,48 @@ body {
 .btn-chart.selected {
 	background-color: #6ad1e6;
 	color: white;
+}
+
+.widget .turnedOn {
+	width: 20px;
+	height: 20px;
+	background-color: #9fef7b;
+		border-radius: 50%;
+	margin: 0 auto;
+	margin-top: 5px;
+	-webkit-box-shadow: 0px 0px 3px 5px #f2e1f2;
+	-moz-box-shadow: 0px 0px 3px 5px #f2e1f2;
+	box-shadow: 0px 0px 3px 5px #e6fbe9;
+	color: #e6fbe9;
+}
+
+
+
+.widget .turnedOff {
+	width: 20px;
+	height: 20px;
+	background-color: #ef7b7b;
+	border-radius: 50%;
+	margin: 0 auto;
+	margin-top: 5px;
+	-webkit-box-shadow: 0px 0px 3px 5px #f2e1f2;
+	-moz-box-shadow: 0px 0px 3px 5px #f2e1f2;
+	box-shadow: 0px 0px 3px 5px #f2e1f2; 
+}
+
+.jumbotron#stats {
+	border-bottom: 1px dashed #fff;
+}
+
+.container h2 {
+	color: #6ad1e6;
+}
+
+.animate-enter {
+    -webkit-transition: 1s linear all; /* Chrome */
+    transition: 1s linear all;
+    opacity: 0;
+}
+.animate-enter.animate-enter-active {
+    opacity: 1;
 }
