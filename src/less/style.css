@@ -1,3 +1,5 @@
+/* @override http://elmaaler-c9-rasmuslp.c9.io/build/assets/style.css */
+
 /* @override https://elmaaler-c9-rasmuslp.c9.io/src/css/style.css */
 
 /* @override https://elmaaler-c9-rasmuslp.c9.io/style.css */
@@ -82,6 +84,35 @@ body {
 	
 }
 
+.panel-aware {
+	border-radius: 10px;
+	text-align: center;
+}
+
+.panel-heading{
+	background-color: #6ad1e6;
+	border-radius: 0px;
+}
+
+.panel-body .usage{
+	color: #6ad1e6;
+	font-weight: lighter;
+	font-size: 25px;
+}
+
+
+
+
+.panel-heading h5{
+	color: white;
+	margin: 0px 0px 0px 0px;
+	width: auto;
+}
+
+.panel-heading button {
+	float: left;
+}
+
 .adminPanel {
 	display:none !important;
 }
@@ -129,7 +160,6 @@ body {
 
 .widget {
 		text-align: center;
-		height: 120px;
 }
 
 .widget.disabled h5{
@@ -177,6 +207,7 @@ body {
 		background-color: #fff;
 		padding: 0px;
 		border-radius: 10px;
+		height: auto;
 		
 }
 
@@ -296,9 +327,14 @@ body {
 .btn-chart {
 	background-color: #ededed;
 	color: #6ad1e6;
-	margin-bottom: 20px;
   transition: all 0.4s ease;
   background-color: #fff;
+}
+
+.widget-heading button {
+	padding: 2px;
+	margin-bottom: 0px;
+
 }
 
 .btn-chart:hover {
@@ -309,6 +345,10 @@ body {
 .btn-chart.selected {
 	background-color: #6ad1e6;
 	color: white;
+}
+
+.widget {
+  height: 400px;
 }
 
 .widget .turnedOn {
@@ -322,6 +362,7 @@ body {
 	-moz-box-shadow: 0px 0px 3px 5px #f2e1f2;
 	box-shadow: 0px 0px 3px 5px #e6fbe9;
 	color: #e6fbe9;
+	transition: all 0.4s ease;
 }
 
 
@@ -336,6 +377,16 @@ body {
 	-webkit-box-shadow: 0px 0px 3px 5px #f2e1f2;
 	-moz-box-shadow: 0px 0px 3px 5px #f2e1f2;
 	box-shadow: 0px 0px 3px 5px #f2e1f2; 
+		transition: all 0.4s ease;
+	
+}
+
+.ledIndicator {
+	display: inline-block;
+	float: left;
+	display: block;
+	margin: 6px;
+
 }
 
 .jumbotron#stats {

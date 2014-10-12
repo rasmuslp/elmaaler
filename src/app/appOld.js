@@ -125,8 +125,16 @@
             this.timeStamp = 'undefined';
             this.plotData = [];
             this.rawDataErrors = 0;
-            this.devices = [];
+            
+            // Device vars
             this.edgeInProgress = [];
+            this.devices = [];
+            this.unknownDeviceOffErrors = 0;
+            this.trimmedDeviceByImpossibleUsage = 0;
+            
+            // Device detection vars
+            this.enableTrimOfChanges = true;
+            this.enableDeviceUsageTrimmer = true;
 
             DataService.setup(this.device, this.selectedDataset.dataId);
             this.data = DataService.data();
@@ -164,7 +172,8 @@
 
                      var newUsage = self.calculateUsage(current, prev);
 
-                     self.deviceIdentifier(newUsage);
+                     self.deviceUsageTrimmer(newUsage);
+                     self.deviceIdentifier(current, newUsage);
 
                      var proceed = self.rawDataErrorCorrector(prev, newUsage);
                      if (!proceed) {
@@ -188,8 +197,34 @@
             time = time / 1000.0;
             return Math.round(3600 / time);
          };
+         
+         this.deviceUsageTrimmer = function(usage) {
+            var totalActiveDeviceUsage = 0;
+            
+            for (var i = 0; i < this.devices.length; i++) {
+               if (this.devices[i].active) {
+                  if (this.devices[i].usage > usage) {
+                     // Alright, this can't be happening. Turning device off.
+                     this.trimmedDeviceByImpossibleUsage++;
+                     if (this.enableDeviceUsageTrimmer) {
+                        this.devices[i].active = false;
+                        console.log('Turned off device "' + this.devices[i].title + '" as it uses ' + this.devices[i].usage + 'W while only ' + usage + 'W is actually being used. Error counter: ' + this.trimmedDeviceByImpossibleUsage);   
+                        continue;
+                     } else {
+                        console.log('Device using too much power: "' + this.devices[i].title + '" as it uses ' + this.devices[i].usage + 'W while only ' + usage + 'W is actually being used. Error counter: ' + this.trimmedDeviceByImpossibleUsage);   
+                     }
+                  }
+                  totalActiveDeviceUsage += this.devices[i].usage;
+               }
+            }
+            
+            if (totalActiveDeviceUsage > usage) {
+               // Oh boy, here we go again..... Devices can't use more power than registered by the meter.
+               console.log('Devices are using more power (' + totalActiveDeviceUsage + 'W) than the meter says (' + usage + 'W)');
+            }
+         };
 
-         this.deviceIdentifier = function(usage) {
+         this.deviceIdentifier = function(dataPoint, usage) {
             if (this.deviceIdentifierEnabled && this.currentUsage) {
                var diff = usage - this.currentUsage;
                if (Math.abs(diff) > (this.currentUsage * 0.10)) {
@@ -198,7 +233,7 @@
                   console.log('Edge detected: ' + this.currentUsage + 'W to ' + usage + 'W');
                }
                else if (this.edgeInProgress.length > 0) {
-                  console.log('Edge might have ended?');
+                  //console.log('Edge might have ended?');
                   // Edge ended ?
 
                   var deviceUsage = usage - this.edgeInProgress[0];
@@ -207,7 +242,7 @@
                   var TTT = usage - this.edgeInProgress[this.edgeInProgress.length - 1];
 
                   if (risingEdge) {
-                     console.log('Edge is rising');
+                     //console.log('Edge is rising');
                      if (TTT < 0) {
                         // Rising edge ended
                         // Do nothing here, just continue with the sweet code below.
@@ -221,7 +256,7 @@
                      }
                   }
                   else {
-                     console.log('Edge is falling');
+                     //console.log('Edge is falling');
                      if (TTT > 0) {
                         // Falling edge ended
                         // Do nothing here, just continue with the sweet code below.
@@ -238,11 +273,11 @@
                   deviceUsage = Math.abs(deviceUsage);
                   var deviceId = null;
                   console.log('Unidentified device usage: ' + deviceUsage);
-                  console.log('Devices:');
+                  // console.log('Devices:');
                   for (var i = 0; i < this.devices.length; i++) {
-                     console.log('Usage: ' + this.devices[i].usage);
-                     console.log('Usage diff: ' + (deviceUsage - this.devices[i].usage));
-                     console.log('Limit: ' + 0.20 * this.devices[i].usage);
+                     // console.log('Usage: ' + this.devices[i].usage);
+                     // console.log('Usage diff: ' + (deviceUsage - this.devices[i].usage));
+                     // console.log('Limit: ' + 0.20 * this.devices[i].usage);
 
                      if (Math.abs((deviceUsage - this.devices[i].usage)) < 0.10 * this.devices[i].usage) {
                         // Device match
@@ -251,35 +286,56 @@
                         break;
                      }
                   }
+                  
                   if (deviceId === null) {
+                     if (!risingEdge) {
+                        // Unknown device turned off
+                        this.unknownDeviceOffErrors++;
+                        console.log('Unknown device turned off. Usage diff: ' + deviceUsage + 'W. Error counter: ' + this.unknownDeviceOffErrors);
+                        if (this.enableTrimOfChanges) {
+                           return;
+                        }
+                     }
+                     
                      // New device
                      var device = {
                         title: null,
-                        active: null,
                         usage: deviceUsage,
+                        active: null,
+                        stateChangeDates: [],
                         totalUsage: 0,
-                        data: [{
-                           timeStamp: 0,
-                           usage: 978
-                        }, {
-                           timeStamp: 1,
-                           usage: 983
-                        }]
+                        data: []
                      };
                      this.devices.push(device);
                      deviceId = this.devices.indexOf(device);
                      this.devices[deviceId].title = 'Device ' + deviceId;
                   }
+                  
+                  // Add plot data to device
+                  //TODO: Add data from the rising/falling edge (can't do that now as timestamps are missing)
+                  //TODO: Subtract device usage from the remaining baseline
+                  this.devices[deviceId].data.push({
+                     x: this.calculateDataPointDate(dataPoint),
+                     usage: deviceUsage
+                  });
 
                   if (risingEdge) {
                      // Rising edge
                      console.log('Device ' + deviceId + ' turned on with usage ' + deviceUsage + ' W');
                      this.devices[deviceId].active = true;
+                     this.devices[deviceId].stateChangeDates.push({
+                       on: this.calculateDataPointDate(dataPoint),
+                       off: null
+                     });
                   }
                   else {
                      // Falling edge
                      console.log('Device ' + deviceId + ' turned off with usage ' + deviceUsage + ' W');
                      this.devices[deviceId].active = false;
+                     var stateChangeDates = this.devices[deviceId].stateChangeDates;
+                     if (stateChangeDates.length > 0) {
+                        this.devices[deviceId].stateChangeDates[stateChangeDates.length-1].off = this.calculateDataPointDate(dataPoint);
+                     }
                   }
                   this.edgeInProgress = [];
                }
@@ -322,12 +378,14 @@
 
             return true;
          };
+         
+         this.calculateDataPointDate = function(dataPoint) {
+            return new Date(this.timeStamp * 1000 + dataPoint.timeDiff);
+         };
 
          this.addDataToPlot = function(dataPoint, usage) {
-            var pointTimeStamp = this.timeStamp * 1000 + dataPoint.timeDiff;
-
             this.plotData.push({
-               x: new Date(pointTimeStamp),
+               x: this.calculateDataPointDate(dataPoint),
                usage: usage
             });
 

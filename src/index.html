@@ -112,7 +112,8 @@
             <div class="widget-heading"><h5>{{device.title}} <button ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart btn-sm" ng-show="pwrCtrl.authed"><span class="glyphicon glyphicon-trash"></span></button></h5></div>
             <h2>{{device.usage}} W</h2>
             <p ng-class="{turnedOn: device.active, turnedOff: !device.active}" class="turnedOn" ng-click="device.active = !device.active"></p>
-
+            <br/>
+              <div class="ledIndicator" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom" ng-repeat="date in device.stateChangeDates"><p ng-class="{turnedOn: date.on, turnedOff: !date.off}" class="turnedOn"></p></div>
           </div>
           </div>
     </div>
