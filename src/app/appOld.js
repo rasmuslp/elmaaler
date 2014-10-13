@@ -137,13 +137,14 @@
 
             // Device vars
             this.edgeInProgress = [];
+            this.edgeNext = [];
             this.devices = [];
             this.unknownDeviceOffErrors = 0;
             this.edgeInProgressLastUsageOffErrors = 0;
             this.trimmedDeviceByImpossibleUsage = 0;
 
             // Device detection vars
-            this.enableTrimOfChanges = false;
+            this.enableTrimOfChanges = true;
             this.enableDeviceUsageTrimmer = false;
 
             DataService.setup(this.device, this.selectedDataset.dataId);
@@ -244,6 +245,7 @@
                   }
                   this.edgeInProgress.push(usage);
                   console.log('Edge detected: ' + this.currentUsage + 'W to ' + usage + 'W');
+                  //FIXME: Code from ID:1 needs to be modified and moved here.
                }
                else if (this.edgeInProgress.length > 0) {
                   // Edge ended ?
@@ -297,8 +299,20 @@
                      } else {
                         // Change more than 5%
                         console.log('Change MORE than 5% Edge continuing.');
-                        this.edgeInProgress.push(usage);
-                        return;
+                        if (edgeStartRising !== edgeEndRising) {
+                           //ID:1
+                           // Direction changed, other device must have turned on. End edge and start a new.
+                           //NB: This might not be reliable!
+                           console.log('Direction changed, new device');
+                           console.log('Usage for next round: ' + this.currentUsage + 'W ' + this.usage + 'W');
+                           this.edgeNext.push(this.currentUsage);
+                           this.edgeNext.push(this.usage);
+                        } else {
+                           // Direction unchanged.
+                           console.log('Direction unchanged, log device');
+                           this.edgeInProgress.push(usage);
+                           return;
+                        }
                      }
                   }
 
@@ -368,7 +382,9 @@
                         this.devices[deviceId].stateChangeDates[stateChangeDates.length - 1].off = this.calculateDataPointDate(dataPoint);
                      }
                   }
-                  this.edgeInProgress = [];
+
+                  this.edgeInProgress = this.edgeNext;
+                  this.edgeNext = [];
                }
             }
          };
@@ -417,14 +433,14 @@
          this.addDataToPlot = function(dataPoint, usage) {
             this.currentUsageChange = this.currentUsage - usage;
             this.currentUsage = usage;
-            
+
             var currentDeviceUsage = 0;
             for (var i = 0; i < this.devices.length; i++) {
                if (this.devices[i].active) {
                   currentDeviceUsage += this.devices[i].usage;
                }
             }
-         
+
             console.log('No. registered devices ' + this.devices.length + ' of which ' + this.countActiveDevices() + ' devices are on.');
 
             this.plotData.push({
