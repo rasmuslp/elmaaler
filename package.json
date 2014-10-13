@@ -39,6 +39,7 @@
     "time-grunt": "~1.0.0"
   },
   "scripts": {
+    "postinstall": "bower install",
     "test": "grunt travis --verbose"
   }
 }
