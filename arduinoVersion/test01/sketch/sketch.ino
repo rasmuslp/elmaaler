@@ -6,6 +6,8 @@ double wireMillis;
 bool printed;
 bool currentState;
 
+int oldTimestamp;
+
 void setup()
 {
   pinMode(pin, OUTPUT);
@@ -19,28 +21,26 @@ void setup()
 void loop()
 {
     int intencity = analogRead(A0);
+    //Serial.println(intencity);
     digitalWrite(pin, state);
-    if (intencity < 500 && currentState != LOW) {
+    if (intencity < 800 && currentState != LOW) {
        lightMillis = millis();
-       currentState = LOW;
-    } else if(currentState == LOW && intencity > 500) {
-       currentState = HIGH;
-    }
+         //Serial.print("LDR read Time (MS): ");
+         //Serial.println(lightMillis);
+         Serial.print("Current usage: ");
+         Serial.println(oldTimestamp-lightMillis/oldTimestamp);
+         oldTimestamp = lightMillis;
+         currentState = LOW;
+
     
-  if (currentState == LOW && lightMillis > 0 && wireMillis > 0) {
-    Serial.print("LDR read Time (MS): ");
-    Serial.print(lightMillis);
-    Serial.print(" | WIRE read Time (MS) ");
-    Serial.print(wireMillis);
-    Serial.print(" | WIRE - LIGHT (MS): ");
-    Serial.println(wireMillis - lightMillis);
-    printed = true;
-    lightMillis = 0;
-    wireMillis = 0;
-  }
+  } else if(currentState == LOW && intencity > 800) {
+     currentState = HIGH;
+    }
 }
 
 void blink()
 {
   wireMillis = millis();
+    Serial.print(" | WIRE read Time (MS) ");
+    Serial.print(wireMillis);
 }
