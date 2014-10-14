@@ -363,17 +363,38 @@
 
             var deviceId = null;
             // console.log('Devices:');
+            var candidates = [];
             for (var i = 0; i < this.devices.length; i++) {
                 // console.log('Usage: ' + this.devices[i].usage);
                 // console.log('Usage diff: ' + (deviceUsage - this.devices[i].usage));
                 // console.log('Limit: ' + 0.20 * this.devices[i].usage);
 
-                if (Math.abs((deviceUsage - this.devices[i].usage)) < 0.10 * this.devices[i].usage) {
-                    // Device match
-                    console.log('Device match (' + this.devices[i].usage + 'W) determined usage: ' + deviceUsage);
-                    deviceId = i;
-                    break;
+                var deviceUsageDiff = Math.abs(deviceUsage - this.devices[i].usage);
+                if (deviceUsageDiff < 0.10 * this.devices[i].usage) {
+                    // Device candidate found
+                    candidates.push({
+                        id: i,
+                        usageDiff: deviceUsageDiff
+                    });
                 }
+            }
+            if (candidates.length > 0) {
+                candidates.sort(function(a, b) {
+                   if (a.usageDiff < b.usageDiff) {
+                       return -1;
+                   }
+                   if (a.usageDiff > b.usageDiff) {
+                       return 1;
+                   }
+                   return 0;
+                });
+                console.log('Candidates: %o', candidates );
+                deviceId = candidates[0].id;
+                console.log('Device match (' + this.devices[deviceId].usage + 'W) determined usage: ' + deviceUsage);
+            }
+
+            if (candidates.length > 1) {
+                console.error('More than one device candidate!! (Good?)');
             }
 
             if (deviceId === null) {
@@ -412,6 +433,9 @@
             if (edgeStartDirection === 1) {
                 // Rising edge
                 console.log('Device ' + deviceId + ' turned on with usage ' + deviceUsage + ' W');
+                if (this.devices[deviceId].active) {
+                    console.warn('Device ' + deviceId + ' is already turned on!');
+                }
                 this.devices[deviceId].active = true;
                 this.devices[deviceId].stateChangeDates.push({
                     on: this.calculateDataPointDate(dataPoint),
