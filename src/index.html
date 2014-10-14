@@ -104,23 +104,33 @@
     </div>
 
 
-  <div class="jumbotron" id="stats">
-    <div class="container">
-          <h2 class="text-center">Detected devices</h2>
-          <div class="col-md-2" ng-repeat="(key, device) in pwrCtrl.devices" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
-          <div class="widget widget-rect" ng-class="{active: device.active}">
-            <div class="widget-heading"><h5>{{device.title}} <button ng-hide="true" ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart btn-sm" ng-show="pwrCtrl.authed"><span class="glyphicon glyphicon-trash"></span></button></h5></div>
-            <h2>{{device.usage}} W</h2>
-            <p ng-class="{turnedOn: device.active, turnedOff: !device.active}" ng-click="device.active = !device.active" ng-mouseover="device.isActive = true" ng-mouseleave="device.isActive = false"></p>
-            <br/>
-            <div class="popOver" ng-show="device.isActive">
-              <div class="ledIndicator" ng-repeat="stateChange in device.stateChangeDates"><p ng-class="{turnedOn: stateChange.on && !stateChange.off, turnedOff: stateChange.off}"></p><span>On time: {{stateChange.on | date:'HH:mm:ss'}}</span><span>Off time: {{stateChange.off | date: 'HH:mm:ss'}}</span></div>
+<div class="jumbotron" id="stats">
+  <div class="container">
+    <h2 class="text-center">Detected devices</h2>
+    <div class="col-md-2" ng-repeat="(key, device) in pwrCtrl.devices" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
+      <div class="widget widget-rect" ng-class="{active: device.active}">
+        <div class="widget-heading">
+
+          <h5>{{device.title}} <button ng-hide="true" ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart btn-sm" ng-show="pwrCtrl.authed"><span class="glyphicon glyphicon-trash"></span></button></h5>
+        </div>
+        <div class="widget-body">
+          <h2>{{device.usage}} W</h2>
+          <p ng-class="{turnedOn: device.active, turnedOff: !device.active}" ng-click="device.active = !device.active" ng-mouseover="device.isActive = true" ng-mouseleave="device.isActive = false"></p>
+          <br/>
+          <div class="container">
+          <div class="popOver row" ng-show="device.isActive">
+            <div class="ledIndicator col-md-2" ng-repeat="stateChange in device.stateChangeDates">
+                <p ng-class="{turnedOn: stateChange.on && !stateChange.off, turnedOff: stateChange.off}"></p><span>On time: {{stateChange.on | date:'HH:mm:ss'}}</span><span>Off time: {{stateChange.off | date: 'HH:mm:ss'}}</span>
             </div>
           </div>
           </div>
+        </div>
+      </div>
     </div>
   </div>
-
+</div>
+    
+      
 <!--  <div class="tabTron" style="display:none">
     <div class="tabContainer">
       <div class="btn-group tabButtons">

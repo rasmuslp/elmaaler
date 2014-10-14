@@ -170,7 +170,6 @@
                      // New data
                      self.data.$getRecord(event.key).verified = false;
                      self.totalUsage++;
-
                      if (event.prevChild === null) {
                         // No previous point => no calculation
                         return;
@@ -236,157 +235,176 @@
          };
 
          this.deviceIdentifier = function(dataPoint, usage) {
-            if (this.deviceIdentifierEnabled && this.currentUsage) {
-               var diff = usage - this.currentUsage;
-               if (Math.abs(diff) > (this.currentUsage * 0.10)) {
-                  // Edge
-                  if (this.edgeInProgress.length === 0) {
-                     this.edgeInProgress.push(this.currentUsage);
-                  }
+            if (!(this.deviceIdentifierEnabled && this.currentUsage)) {
+               return;
+            }
+
+            var currentUsage = this.currentUsage;
+            var diff = usage - currentUsage;
+            console.log('DI: ' + currentUsage + 'W to ' + usage + 'W');
+
+            var edgeStartRising = null;
+            var edgeEndRising = null;
+            if (this.edgeInProgress.length > 1) {
+               // Determine directions
+               edgeStartRising = (this.edgeInProgress[1] - this.edgeInProgress[0]) > 0 ? true : false;
+               edgeEndRising = (usage - this.edgeInProgress[this.edgeInProgress.length - 1]) > 0 ? true : false;
+            }
+
+            if (Math.abs(diff) > (currentUsage * 0.10)) {
+               // Edge
+               console.log('Edge detected: ' + currentUsage + 'W to ' + usage + 'W');
+
+               if (this.edgeInProgress.length === 0) {
+                  // New edge, push points and return
+                  this.edgeInProgress.push(currentUsage);
                   this.edgeInProgress.push(usage);
-                  console.log('Edge detected: ' + this.currentUsage + 'W to ' + usage + 'W');
-                  //FIXME: Code from ID:1 needs to be modified and moved here.
+                  return;
                }
-               else if (this.edgeInProgress.length > 0) {
-                  // Edge ended ?
-                  //console.log('Edge might have ended?');
-
-                  var deviceUsageMin = Math.min.apply(null, this.edgeInProgress);
-                  var deviceUsageMax = Math.max.apply(null, this.edgeInProgress);
-                  var deviceUsage = deviceUsageMax - deviceUsageMin;
-                  var edgeStartRising = (this.edgeInProgress[1] - this.edgeInProgress[0]) > 0 ? true : false;
-                  var edgeEndRising = (usage - this.edgeInProgress[this.edgeInProgress.length - 1]) > 0 ? true : false;
-
-                  console.log('Edge about to end ? Detected: ' + this.currentUsage + 'W to ' + usage + 'W');
-                  if (this.currentUsage !== this.edgeInProgress[this.edgeInProgress.length - 1]) {
-                     this.edgeInProgressLastUsageOffErrors++;
-                     console.log('edgeInProgressLastUsageOffErrors: ' + this.edgeInProgressLastUsageOffErrors);
-                  }
-
-                  var edgeEndDetection = 'belowChange5';
-
-                  if (edgeEndDetection === 'directionChange') {
-                     if (edgeStartRising) {
-                        if (edgeEndRising) {
-                           // Rising edge still rising
-                           this.edgeInProgress.push(usage);
-                           console.log('Rising edge still rising');
-                           return;
-                        }
-                        else {
-                           // Rising edge ended
-                           // Do nothing here, just continue with the sweet code below.
-                           console.log('Edge ended rising, as it just fell');
-                        }
-                     }
-                     else {
-                        if (edgeEndRising) {
-                           // Falling edge ended
-                           // Do nothing here, just continue with the sweet code below.
-                           console.log('Edge ended falling, as it just increased');
-                        }
-                        else {
-                           // Falling edge still falling
-                           this.edgeInProgress.push(usage);
-                           console.log('Falling edge still falling');
-                           return;
-                        }
-                     }
-                  } else if (edgeEndDetection === 'belowChange5') {
-                     if (Math.abs(diff) < 0.05 * this.currentUsage) {
-                        // Only ripples now, device change ended
-                        console.log('Change < 5% Edge ended.');
-                     } else {
-                        // Change more than 5%
-                        console.log('Change MORE than 5% Edge continuing.');
-                        if (edgeStartRising !== edgeEndRising) {
-                           //ID:1
-                           // Direction changed, other device must have turned on. End edge and start a new.
-                           //NB: This might not be reliable!
-                           console.log('Direction changed, new device');
-                           console.log('Usage for next round: ' + this.currentUsage + 'W ' + this.usage + 'W');
-                           this.edgeNext.push(this.currentUsage);
-                           this.edgeNext.push(this.usage);
-                        } else {
-                           // Direction unchanged.
-                           console.log('Direction unchanged, log device');
-                           this.edgeInProgress.push(usage);
-                           return;
-                        }
-                     }
-                  }
-
-                  var deviceId = null;
-                  console.log('Edge detection done. Device usage: ' + deviceUsage);
-                  // console.log('Devices:');
-                  for (var i = 0; i < this.devices.length; i++) {
-                     // console.log('Usage: ' + this.devices[i].usage);
-                     // console.log('Usage diff: ' + (deviceUsage - this.devices[i].usage));
-                     // console.log('Limit: ' + 0.20 * this.devices[i].usage);
-
-                     if (Math.abs((deviceUsage - this.devices[i].usage)) < 0.10 * this.devices[i].usage) {
-                        // Device match
-                        console.log('Device match (' + this.devices[i].usage + 'W) determined usage: ' + deviceUsage);
-                        deviceId = i;
-                        break;
-                     }
-                  }
-
-                  if (deviceId === null) {
-                     if (!edgeStartRising) {
-                        // Unknown device turned off
-                        this.unknownDeviceOffErrors++;
-                        console.log('Unknown device turned off. Usage diff: ' + deviceUsage + 'W. Error counter: ' + this.unknownDeviceOffErrors);
-                        if (this.enableTrimOfChanges) {
-                           return;
-                        }
-                     }
-
-                     // New device
-                     var device = {
-                        title: null,
-                        usage: deviceUsage,
-                        active: null,
-                        stateChangeDates: [],
-                        totalUsage: 0,
-                        data: []
-                     };
-                     this.devices.push(device);
-                     deviceId = this.devices.indexOf(device);
-                     this.devices[deviceId].title = 'Device ' + deviceId;
-                  }
-
-                  // Add plot data to device
-                  //TODO: Add data from the rising/falling edge (can't do that now as timestamps are missing)
-                  //TODO: Subtract device usage from the remaining baseline
-                  this.devices[deviceId].data.push({
-                     x: this.calculateDataPointDate(dataPoint),
-                     usage: deviceUsage
-                  });
-
-                  if (edgeStartRising) {
-                     // Rising edge
-                     console.log('Device ' + deviceId + ' turned on with usage ' + deviceUsage + ' W');
-                     this.devices[deviceId].active = true;
-                     this.devices[deviceId].stateChangeDates.push({
-                        on: this.calculateDataPointDate(dataPoint),
-                        off: null
-                     });
+               else {
+                  // Edge already in progress
+                  if (edgeStartRising !== edgeEndRising) {
+                     // Direction changed, other device must have turned on. End edge and start a new.
+                     //NB: This might not be reliable!
+                     console.log('Direction changed, new device');
+                     console.log('Usage for next round: ' + currentUsage + 'W ' + usage + 'W');
+                     this.edgeNext.push(currentUsage);
+                     this.edgeNext.push(usage);
                   }
                   else {
-                     // Falling edge
-                     console.log('Device ' + deviceId + ' turned off with usage ' + deviceUsage + ' W');
-                     this.devices[deviceId].active = false;
-                     var stateChangeDates = this.devices[deviceId].stateChangeDates;
-                     if (stateChangeDates.length > 0) {
-                        this.devices[deviceId].stateChangeDates[stateChangeDates.length - 1].off = this.calculateDataPointDate(dataPoint);
-                     }
+                     // Direction unchanged, push point and return
+                     this.edgeInProgress.push(usage);
+                     return;
                   }
-
-                  this.edgeInProgress = this.edgeNext;
-                  this.edgeNext = [];
                }
             }
+
+            if (this.edgeInProgress.length > 0) {
+               // Edge ended ?
+
+               console.log('Edge about to end ? Detected: ' + currentUsage + 'W to ' + usage + 'W');
+               if (currentUsage !== this.edgeInProgress[this.edgeInProgress.length - 1]) {
+                  this.edgeInProgressLastUsageOffErrors++;
+                  console.error('edgeInProgressLastUsageOffErrors: ' + this.edgeInProgressLastUsageOffErrors);
+               }
+
+               var edgeEndDetection = 'directionChange';
+
+               if (edgeEndDetection === 'directionChange') {
+                  if (edgeStartRising) {
+                     if (edgeEndRising) {
+                        // Rising edge still rising
+                        this.edgeInProgress.push(usage);
+                        console.log('Rising edge still rising');
+                        return;
+                     }
+                     else {
+                        // Rising edge ended
+                        // Do nothing here, just continue with the sweet code below.
+                        console.log('Edge ended rising, as it just fell');
+                     }
+                  }
+                  else {
+                     if (edgeEndRising) {
+                        // Falling edge ended
+                        // Do nothing here, just continue with the sweet code below.
+                        console.log('Edge ended falling, as it just increased');
+                     }
+                     else {
+                        // Falling edge still falling
+                        this.edgeInProgress.push(usage);
+                        console.log('Falling edge still falling');
+                        return;
+                     }
+                  }
+               }
+               else if (edgeEndDetection === 'belowChange5') {
+                  if (Math.abs(diff) < 0.05 * currentUsage) {
+                     // Only ripples now, device change ended
+                     console.log('Change < 5% Edge ended.');
+                  }
+                  else {
+                     console.log('Change MORE than 5%. Edge continuing.');
+                     this.edgeInProgress.push(usage);
+                     return;
+                  }
+               }
+            }
+
+            // Process ended edge
+            var deviceUsageMin = Math.min.apply(null, this.edgeInProgress);
+            var deviceUsageMax = Math.max.apply(null, this.edgeInProgress);
+            var deviceUsage = deviceUsageMax - deviceUsageMin;
+            console.log('Edge detection done. Device usage: ' + deviceUsage);
+
+            var deviceId = null;
+            // console.log('Devices:');
+            for (var i = 0; i < this.devices.length; i++) {
+               // console.log('Usage: ' + this.devices[i].usage);
+               // console.log('Usage diff: ' + (deviceUsage - this.devices[i].usage));
+               // console.log('Limit: ' + 0.20 * this.devices[i].usage);
+
+               if (Math.abs((deviceUsage - this.devices[i].usage)) < 0.10 * this.devices[i].usage) {
+                  // Device match
+                  console.log('Device match (' + this.devices[i].usage + 'W) determined usage: ' + deviceUsage);
+                  deviceId = i;
+                  break;
+               }
+            }
+
+            if (deviceId === null) {
+               if (!edgeStartRising) {
+                  // Unknown device turned off
+                  this.unknownDeviceOffErrors++;
+                  console.log('Unknown device turned off. Usage diff: ' + deviceUsage + 'W. Error counter: ' + this.unknownDeviceOffErrors);
+                  if (this.enableTrimOfChanges) {
+                     return;
+                  }
+               }
+
+               // New device
+               var device = {
+                  title: null,
+                  usage: deviceUsage,
+                  active: null,
+                  stateChangeDates: [],
+                  totalUsage: 0,
+                  data: []
+               };
+               this.devices.push(device);
+               deviceId = this.devices.indexOf(device);
+               this.devices[deviceId].title = 'Device ' + deviceId;
+            }
+
+            // Add plot data to device
+            //TODO: Add data from the rising/falling edge (can't do that now as timestamps are missing)
+            //TODO: Subtract device usage from the remaining baseline
+            this.devices[deviceId].data.push({
+               x: this.calculateDataPointDate(dataPoint),
+               usage: deviceUsage
+            });
+
+            if (edgeStartRising) {
+               // Rising edge
+               console.log('Device ' + deviceId + ' turned on with usage ' + deviceUsage + ' W');
+               this.devices[deviceId].active = true;
+               this.devices[deviceId].stateChangeDates.push({
+                  on: this.calculateDataPointDate(dataPoint),
+                  off: null
+               });
+            }
+            else {
+               // Falling edge
+               console.log('Device ' + deviceId + ' turned off with usage ' + deviceUsage + ' W');
+               this.devices[deviceId].active = false;
+               var stateChangeDates = this.devices[deviceId].stateChangeDates;
+               if (stateChangeDates.length > 0) {
+                  this.devices[deviceId].stateChangeDates[stateChangeDates.length - 1].off = this.calculateDataPointDate(dataPoint);
+               }
+            }
+
+            this.edgeInProgress = this.edgeNext;
+            this.edgeNext = [];
          };
 
          this.rawDataErrorCorrector = function(prev, usage) {
@@ -476,6 +494,10 @@
          };
 
          this.countActiveDevices = function() {
+            if (!this.devices) {
+               return 0;
+            }
+
             var count = 0;
             for (var i = 0; i < this.devices.length; i++) {
                if (this.devices[i].active) {
