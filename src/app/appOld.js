@@ -282,8 +282,7 @@
                     if (edgeStartDirection === edgeEndDirection * -1) {
                         // Direction changed, other device must have turned on. End edge and start a new.
                         //NB: This might not be reliable!
-                        console.log('Direction changed, new device');
-                        console.log('Usage for next round: ' + currentUsage + 'W ' + usage + 'W');
+                        console.log('Direction changed: New device. Usage for next round: ' + currentUsage + 'W ' + usage + 'W');
                         this.edgeNext.push(currentUsage);
                         this.edgeNext.push(usage);
                     }
@@ -344,9 +343,15 @@
                     console.log('Change < 5% Edge ended.');
                 }
                 else {
-                    console.log('Change MORE than 5%. Edge continuing.');
-                    this.edgeInProgress.push(usage);
-                    return;
+                    console.log('Change MORE than 5%.');
+                    if (edgeStartDirection === edgeEndDirection * -1) {
+                        // Direction changed, other device must have turned on. End edge and start a new.
+                       console.log('Current edge ending due to direction change.');
+                    } else {
+                       console.log('Edge continuing.');
+                       this.edgeInProgress.push(usage);
+                       return;
+                    }
                 }
             }
 
