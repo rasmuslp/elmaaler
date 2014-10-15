@@ -70,7 +70,9 @@ def solve( instance_no, count, usage ):
     #print "* Found value of %d when looking for %d in instance %d using %d iterations " % ( best_state.consumes, instance.measured_consumption, instance_no, iterations )
     #print "** %d best states " % count
     #print best_states.str_nsmallest
-    response = {'totalConsume': best_state.consumes, 'devices': best_state.devices}
+    instanceDevices = instance.devices
+
+    response = {'totalConsume': best_state.consumes, 'devices': best_state.devices, 'allDevices': instanceDevices}
     return ( response )
 
 # See http://stackoverflow.com/questions/14189540/python-topn-max-heap-use-heapq-or-self-implement

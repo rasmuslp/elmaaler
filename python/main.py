@@ -1,8 +1,3 @@
-from metaheuristic import hill_climber, simulated_annealing
-# import requests
-# import json
-# r = requests.get('https://elmaaler.firebaseio.com/users')
-# print r.json()
 
 from firebase import Firebase
 import matplotlib.pyplot as plt
@@ -31,7 +26,7 @@ for key , dataPoint in iter(sorted(r.iteritems())):
     time = time / 1000.0
     usage = 3600 / time
 
-    if (abs(usage - lastUsage) > 0):
+    if (abs(usage - lastUsage) > 1):
       d.append(usage)
     lastUsage = usage
     prevTime = dataPoint['timeDiff']
@@ -42,14 +37,19 @@ lastUsage = 0
 xvaluesToMeta = []
 subDevices = {}
 tempDec = []
+allDevices = []
+de = [0] * 10
 for i in range(len(d)):
   usage = d[i]
-  if (abs(usage - lastUsage) > 50):
+  if (abs(usage - lastUsage) > 100):
     response = simulated_annealing.solve( 1, 1, usage )
     devicesUsage = response['totalConsume']
+
     for device in response['devices']:
-      c = devicesUsage / len(response['devices'])
-      tempDec.append(c)
+      de[device] = response['allDevices'][device].consumption_mean
+    allDevices.append(de)
+    de = [0] * 10
+
     subDevices[i] = tempDec
     tempDec = []
     s.append(devicesUsage)
@@ -63,26 +63,37 @@ for i in range(len(d)):
 var = raw_input("Save to firebase? YES/NO: ")
 if (var == "YES"):
   f = Firebase('https://elmaaler.firebaseio.com/device/23436f3643fc42ee/data/computed/raw2')
-  r = f.push(s)
+  r = f.push(allDevices)
   print "Firebase Response :";
   print r
 
-N = 5
-menMeans   = (20, 35, 30, 35, 27)
-womenMeans = (25, 32, 34, 20, 25)
-menStd     = (2, 3, 4, 1, 2)
-womenStd   = (3, 5, 2, 3, 3)
-ind = np.arange(N)    # the x locations for the groups
-width = 1.35       # the width of the bars: can also be len(x) sequence
+import numpy as np
+from matplotlib import pyplot as plt
 
-print subDevices
-for key, device in subDevices.iteritems():
-    print device
+print "______________________ ALL DEVICES:_____________________"
+print allDevices
+print len(allDevices)
 
-p1 = plt.bar(xvaluesToMeta, s)
+y = np.array(np.transpose(allDevices))
+print "______________________ Y VALUE:_____________________"
+print y
+print len(y)
+
+x = np.arange(10)
+print "______________________ X VALUE:_____________________"
+print x
+print len(xvaluesToMeta)
+
+# Make new array consisting of fractions of column-totals,
+# using .astype(float) to avoid integer division
+percent = y /  y.sum(axis=0).astype(float) * 100
+
+plt.stackplot(xvaluesToMeta, y)
+
+
+#plt.plot(xvaluesToMeta,allDevices)
+plt.plot(xvaluesToMeta, s)
 plt.plot(d)
-#plt.plot(xvaluesToMeta, s)
-print s
 
 plt.axis([0, len(d), 0, 3000])
 plt.ylabel('WATTS')
