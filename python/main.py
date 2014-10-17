@@ -1,3 +1,4 @@
+from metaheuristic import hill_climber, simulated_annealing
 
 from firebase import Firebase
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ r = f.get()
 d = []
 i = 0
 s = []
-
+ts= []
 prevTime = 0
 
 
@@ -29,6 +30,7 @@ for key , dataPoint in iter(sorted(r.iteritems())):
     if (abs(usage - lastUsage) > 1):
       d.append(usage)
     lastUsage = usage
+    ts.append(dataPoint['timeDiff'])
     prevTime = dataPoint['timeDiff']
 
 print "CurrentUsage from timeDiff conversion DONE"
@@ -39,9 +41,35 @@ subDevices = {}
 tempDec = []
 allDevices = []
 de = [0] * 10
+
+
+def mfreqz(b,a=1):
+    w,h = signal.freqz(b,a)
+    h_dB = 20 * log10 (abs(h))
+    subplot(211)
+    plot(w/max(w),h_dB)
+    ylim(-150, 5)
+    ylabel('Magnitude (db)')
+    xlabel(r'Normalized Frequency (x$\pi$rad/sample)')
+    title(r'Frequency response')
+    subplot(212)
+    h_Phase = unwrap(arctan2(imag(h),real(h)))
+    plot(w/max(w),h_Phase)
+    ylabel('Phase (radians)')
+    xlabel(r'Normalized Frequency (x$\pi$rad/sample)')
+    title(r'Phase response')
+    subplots_adjust(hspace=0.5)
+    show()
+
+from pylab import *
+import scipy.signal as signal
+b,a = signal.iirdesign(wp = [0.05, 0.3], ws= [0.02, 0.35], gstop= 60, gpass=1, ftype='ellip')
+
+mfreqz(d)
+
 for i in range(len(d)):
   usage = d[i]
-  if (abs(usage - lastUsage) > 100):
+  if (abs(usage - lastUsage) > 2000):
     response = simulated_annealing.solve( 1, 1, usage )
     devicesUsage = response['totalConsume']
 
@@ -52,6 +80,7 @@ for i in range(len(d)):
 
     subDevices[i] = tempDec
     tempDec = []
+    print i
     s.append(devicesUsage)
     xvaluesToMeta.append(i)
   lastUsage = usage
@@ -84,15 +113,12 @@ print "______________________ X VALUE:_____________________"
 print x
 print len(xvaluesToMeta)
 
-# Make new array consisting of fractions of column-totals,
-# using .astype(float) to avoid integer division
-percent = y /  y.sum(axis=0).astype(float) * 100
 
 plt.stackplot(xvaluesToMeta, y)
 
 
 #plt.plot(xvaluesToMeta,allDevices)
-plt.plot(xvaluesToMeta, s)
+#plt.plot(xvaluesToMeta, s)
 plt.plot(d)
 
 plt.axis([0, len(d), 0, 3000])
