@@ -1,6 +1,11 @@
 *.sw*
 *~
+
+# Frontend
 build/
 bin/
 node_modules/
 vendor/
+
+# Backend
+*.pyc
