@@ -263,7 +263,22 @@ body {
     float: none;
 }
 
-#splash img {
+#signin {
+      position: absolute;
+      display: block;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      background-color: #6ad1e6;
+      z-index: 10;
+      text-align: center;
+}
+
+#signin img {
 	height: 260px;
 }
 

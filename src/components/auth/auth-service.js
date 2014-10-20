@@ -5,9 +5,11 @@
         .factory('AuthService', ['FB_URI', '$firebase',
             function(FB_URI) {
                 var ref = new Firebase(FB_URI);
-                var ret = {};
+                var object = {};
 
-                ret.createUser = function(credentials) {
+                object.authed = false;
+
+                object.createUser = function(credentials) {
                     console.log('Creating user with: %o', credentials);
                     ref.createUser({
                         email: credentials.email,
@@ -31,7 +33,7 @@
                     });
                 };
 
-                ret.login = function(credentials) {
+                object.login = function(credentials, callback) {
                     console.log('Loging in with: %o', credentials);
                     ref.authWithPassword({
                         email: credentials.email,
@@ -42,18 +44,23 @@
                         }
                         else {
                             console.log('User successfully logged in: %o', authData);
+                            object.authed = true;
+                        }
+                        if (callback && typeof(callback) === 'function') {
+                            callback(error);
                         }
                     }, {
                         remember: false
                     });
                 };
 
-                ret.logout = function() {
+                object.logout = function() {
                     console.log('Logging out. See you soon!');
                     ref.unauth();
+                    object.authed = false;
                 };
 
-                return ret;
+                return object;
             }
         ]);
 

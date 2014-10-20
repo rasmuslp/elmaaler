@@ -9,11 +9,12 @@
   <style type="text/css">
     #splash {
       position: absolute;
-      display: block;
+      display: none;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
+      background-image: url(data:image/png;base64,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);
       background-repeat: no-repeat;
       background-attachment: fixed;
       background-position: center;
@@ -21,117 +22,164 @@
       z-index: 10;
       text-align: center;
     }
+    [ng-cloak]#splash {
+      display: block !important;
+    }
   </style>
 </head>
 
-<body ng-controller="PowerController as pwrCtrl">
-  <div id="splash" class="jumbotron" ng-show="!pwrCtrl.authed">
+<body ng-controller="AuthController as authCtrl">
+  <div id="splash" class="jumbotron" ng-cloak></div>
+
+  <div id="signin" class="jumbotron" ng-cloak ng-show="!authCtrl.authed()">
     <div class="container mainSplash">
-      <div class="col-md-2 "></div>
+      <div class="col-md-2"></div>
 
       <div class="col-md-4 fadeInLeft animated">
         <img src="assets/logo.png" class="img img-responsive img-center">
       </div>
 
-      <div class="col-md-4 loginBox fadeInRight animated" ng-controller="AuthController as authCtrl">
-        <p class="bg-success" ng-cloak ng-hide="pwrCtrl.userError">{{pwrCtrl.userError}}</p>
-        <div class="form-group">
-          <label for="exampleInputEmail1">Email address</label>
-          <input type="email" class="form-control" ng-model="authCtrl.credentials.email" placeholder="Enter email">
-        </div>
-        <div class="form-group">
-          <label for="exampleInputEmail1">Password</label>
-          <input type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Password">
-        </div>
-        <div class="form-group password2  animated fadeIn" ng-show="authCtrl.credentials.newUser === true">
-          <label for="exampleInputEmail2">Re-type password</label>
-          <input type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Re-type Password">
-        </div>
-        <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-cloak ng-click="authCtrl.createUser(); authCtrl.credentials.newUser = !authCtrl.credentials.newUser;"><span class="glyphicon glyphicon-log-out"> Create User</span>
-        </button>
-        <button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-cloak ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
+      <div class="col-md-4 fadeInRight animated" ng-controller="AuthController as authCtrl">
+        <form class="loginBox">
+          <div class="form-group">
+            <label for="loginEmail">Email address</label>
+            <input id="loginEmail" type="email" class="form-control" ng-model="authCtrl.credentials.email" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Password">
+          </div>
+          <p class="bg-danger" ng-show="authCtrl.authError">{{authCtrl.authError}}</p>
+          <button ng-show="!pwrCtrl.authed" type="submit" class="btn btn-login" ng-cloak ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
+          </button>
           <button ng-show="pwrCtrl.authed" type="" class="btn bnt-login" ng-cloak ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
           </button>
-      </div>
-
-    </div>
-  </div>
-<div class="mainsite" ng-show="pwrCtrl.authed">
-  <div class="jumbotron logoTron">
-    <div class="container">
-      <div class="row">
-        <img src="assets/logo.png" class="img img-responsive img-center logo">
+        </form>
       </div>
     </div>
   </div>
 
-  <div class="navbar navbar-fixed-top specialMenu" ng-show="pwrCtrl.authed" ng-cloak role="navigation">
-      <div class="container">
-              <div class="navbar-center"></div>
+  <div id="signup" class="jumbotron" ng-cloak ng-show="false">
+    <div class="container mainSplash">
+      <div class="col-md-2"></div>
 
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+      <div class="col-md-4 fadeInLeft animated">
+        <img src="assets/logo.png" class="img img-responsive img-center">
+      </div>
+
+      <div class="col-md-4 fadeInRight animated" ng-controller="AuthController as authCtrl">
+        <form class="loginBox">
+          <p class="bg-success" ng-cloak ng-hide="pwrCtrl.userError">{{pwrCtrl.userError}}</p>
+          <div class="form-group">
+            <label for="loginEmail">Email address</label>
+            <input id="loginEmail" type="email" class="form-control" ng-model="authCtrl.credentials.email" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Password">
+          </div>
+          <div class="form-group password2  animated fadeIn" ng-show="authCtrl.credentials.newUser === true">
+            <label for="loginPassword2">Re-type password</label>
+            <input id="loginPassword2" type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Re-type Password">
+          </div>
+          <!--<button ng-show="!pwrCtrl.authed" type="" class="btn btn-login" ng-cloak ng-click="authCtrl.createUser(); authCtrl.credentials.newUser = !authCtrl.credentials.newUser;"><span class="glyphicon glyphicon-log-out"> Create User</span>-->
           </button>
-        </div>
-
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
-              </ul>
-            </li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right" ng-controller="AuthController as authCtrl">
-            <li><a href="" ng-click="authCtrl.logout();">Logout</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
+          <button ng-show="!pwrCtrl.authed" type="submit" class="btn btn-login" ng-cloak ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
+            <button ng-show="pwrCtrl.authed" type="" class="btn bnt-login" ng-cloak ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
+            </button>
+        </form>
       </div>
     </div>
+  </div>
 
+  <div ng-cloak ng-show="authCtrl.authed()" ng-controller="PowerController as pwrCtrl">
 
-<div class="jumbotron" id="stats">
-  <div class="container">
-    <h2 class="text-center">Detected devices</h2>
-    <div class="col-md-2" ng-repeat="(key, device) in pwrCtrl.devices" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
-      <div class="widget widget-rect" ng-class="{active: device.active}">
-        <div class="widget-heading">
-
-          <h5>{{device.title}} <button ng-hide="true" ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart btn-sm" ng-show="pwrCtrl.authed"><span class="glyphicon glyphicon-trash"></span></button></h5>
+    <div class="mainsite">
+      <div class="jumbotron logoTron">
+        <div class="container">
+          <div class="row">
+            <img src="assets/logo.png" class="img img-responsive img-center logo">
+          </div>
         </div>
-        <div class="widget-body">
-          <h2>{{device.usage}} W</h2>
-          <p ng-class="{turnedOn: device.active, turnedOff: !device.active}" ng-click="device.active = !device.active" ng-mouseover="device.isActive = true" ng-mouseleave="device.isActive = false"></p>
-          <br/>
-          <div class="container">
-          <div class="popOver row" ng-show="device.isActive">
-            <div class="ledIndicator col-md-2" ng-repeat="stateChange in device.stateChangeDates">
-                <p ng-class="{turnedOn: stateChange.on && !stateChange.off, turnedOff: stateChange.off}"></p><span>On time: {{stateChange.on | date:'HH:mm:ss'}}</span><span>Off time: {{stateChange.off | date: 'HH:mm:ss'}}</span>
+      </div>
+
+      <div class="navbar navbar-fixed-top specialMenu" ng-cloak role="navigation">
+        <div class="container">
+          <div class="navbar-center"></div>
+
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a>
+              </li>
+              <li><a href="#about">About</a>
+              </li>
+              <li><a href="#contact">Contact</a>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">Action</a>
+                  </li>
+                  <li><a href="#">Another action</a>
+                  </li>
+                  <li><a href="#">Something else here</a>
+                  </li>
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Nav header</li>
+                  <li><a href="#">Separated link</a>
+                  </li>
+                  <li><a href="#">One more separated link</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" ng-controller="AuthController as authCtrl">
+              <li><a href="" ng-click="authCtrl.logout();">Logout</a>
+              </li>
+            </ul>
+          </div>
+          <!--/.nav-collapse -->
+        </div>
+      </div>
+
+
+      <div class="jumbotron" id="stats">
+        <div class="container">
+          <h2 class="text-center">Detected devices</h2>
+          <div class="col-md-2" ng-repeat="(key, device) in pwrCtrl.devices" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
+            <div class="widget widget-rect" ng-class="{active: device.active}">
+              <div class="widget-heading">
+
+                <h5>{{device.title}} <button ng-hide="true" ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart btn-sm" ng-show="pwrCtrl.authed"><span class="glyphicon glyphicon-trash"></span></button></h5>
+              </div>
+              <div class="widget-body">
+                <h2>{{device.usage}} W</h2>
+                <p ng-class="{turnedOn: device.active, turnedOff: !device.active}" ng-click="device.active = !device.active" ng-mouseover="device.isActive = true" ng-mouseleave="device.isActive = false"></p>
+                <br/>
+                <div class="container">
+                  <div class="popOver row" ng-show="device.isActive">
+                    <div class="ledIndicator col-md-2" ng-repeat="stateChange in device.stateChangeDates">
+                      <p ng-class="{turnedOn: stateChange.on && !stateChange.off, turnedOff: stateChange.off}"></p><span>On time: {{stateChange.on | date:'HH:mm:ss'}}</span><span>Off time: {{stateChange.off | date: 'HH:mm:ss'}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-    
-      
-<!--  <div class="tabTron" style="display:none">
+
+
+      <!--  <div class="tabTron" style="display:none">
     <div class="tabContainer">
       <div class="btn-group tabButtons">
         <button type="button" class="btn btn-tab" ng-click="tab = 1" ng-class="{selected:tab === 1}">Why be aware?</button>
@@ -154,12 +202,12 @@
       </div>
     </div>
   </div>-->
-  <div class="pulse">
-    <!--Indication pulse-->
-  </div>
+      <div class="pulse">
+        <!--Indication pulse-->
+      </div>
 
 
-<!--  <div class="jumbotron" id="pulse">
+      <!--  <div class="jumbotron" id="pulse">
      <div class="row">
     <div class="col-md-4">
     </div>
@@ -171,109 +219,110 @@
     </div>
   </div>-->
 
-  <div class="jumbotron" id="stats">
-    <div class="container">
-      <h2 class="text-center">Stats</h2>
-      <div class="row">
-        <div class="btn-group chartButtons" ng-init="range = 4">
-          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(0); range = 1" ng-class="{selected:range === 1}">All Data</button>
-          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2" ng-class="{selected:range === 2}">Last 24 hours</button>
-          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3" ng-class="{selected:range === 3}">Last hour</button>
-          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4" ng-class="{selected:range === 4}">Last 30 minutes</button>
-          <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(5); range = 5" ng-class="{selected:range === 5}">Last 5 minutes</button>
+      <div class="jumbotron" id="stats">
+        <div class="container">
+          <h2 class="text-center">Stats</h2>
+          <div class="row">
+            <div class="btn-group chartButtons" ng-init="range = 4">
+              <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(0); range = 1" ng-class="{selected:range === 1}">All Data</button>
+              <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(1440); range = 2" ng-class="{selected:range === 2}">Last 24 hours</button>
+              <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(60); range = 3" ng-class="{selected:range === 3}">Last hour</button>
+              <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(30); range = 4" ng-class="{selected:range === 4}">Last 30 minutes</button>
+              <button type="button" class="btn btn-chart" ng-click="pwrCtrl.setPlotTime(5); range = 5" ng-class="{selected:range === 5}">Last 5 minutes</button>
+            </div>
+          </div>
+          <div class="col-xs-6  col-md-3">
+            <div class="widget widget-rect">
+              <h5>Current Usage</h5>
+              <h2>{{pwrCtrl.currentUsage}} <div class="currentUsageChange" ng-class="{'posetive animated fadeInDown': pwrCtrl.currentUsageChange > 0, 'negative animated fadeInUp': pwrCtrl.currentUsageChange < 0}">{{pwrCtrl.currentUsageChange}}</h2>
+              <h2></h2>
+              <p>watt</p>
+            </div>
+          </div>
+          <div class="col-xs-6 col-md-3">
+            <div class="widget widget-rect">
+              <h5>Total Usage</h5>
+              <h2>{{pwrCtrl.totalUsage / 1000 | number: 3}}</h2>
+              <p>kWh</p>
+            </div>
+          </div>
+
+          <div class="col-xs-6 col-md-3">
+            <div class="widget widget-rect">
+              <h5>Total Price</h5>
+              <h2>{{pwrCtrl.totalUsage/1000 * pwrCtrl.currentPrice | number: 2}}</h2>
+              <p>DKK</p>
+            </div>
+          </div>
+
+          <div class="col-xs-6 col-md-3">
+            <div class="widget widget-rect">
+              <h5>Active Devices</h5>
+              <h2>{{pwrCtrl.countActiveDevices()}} / {{pwrCtrl.devices.length}}</h2>
+              <p>STK</p>
+            </div>
+          </div>
+
+          <div class="col-xs-6 col-md-3" style="display:none">
+            <div class="widget widget-rect disabled">
+              <h5>Add widget</h5>
+              <p ng-click="pwrCtrl.addWidget()">+</p>
+            </div>
+          </div>
         </div>
-    </div>
-    <div class="col-xs-6  col-md-3">
-      <div class="widget widget-rect">
-        <h5>Current Usage</h5>
-        <h2>{{pwrCtrl.currentUsage}} <div class="currentUsageChange" ng-class="{'posetive animated fadeInDown': pwrCtrl.currentUsageChange > 0, 'negative animated fadeInUp': pwrCtrl.currentUsageChange < 0}">{{pwrCtrl.currentUsageChange}}</h2>
-        <h2></h2>
-        <p>watt</p>
       </div>
-    </div>
-    <div class="col-xs-6 col-md-3">
-      <div class="widget widget-rect">
-        <h5>Total Usage</h5>
-        <h2>{{pwrCtrl.totalUsage / 1000 | number: 3}}</h2>
-        <p>kWh</p>
-      </div>
-    </div>
-    
-    <div class="col-xs-6 col-md-3">
-      <div class="widget widget-rect">
-        <h5>Total Price</h5>
-        <h2>{{pwrCtrl.totalUsage/1000 * pwrCtrl.currentPrice | number: 2}}</h2>
-        <p>DKK</p>
-      </div>
-    </div>
-    
-    <div class="col-xs-6 col-md-3">
-      <div class="widget widget-rect">
-        <h5>Active Devices</h5>
-        <h2>{{pwrCtrl.countActiveDevices()}} / {{pwrCtrl.devices.length}}</h2>
-        <p>STK</p>
-      </div>
-    </div>
 
-    <div class="col-xs-6 col-md-3" style="display:none">
-      <div class="widget widget-rect disabled">
-        <h5>Add widget</h5>
-        <p ng-click="pwrCtrl.addWidget()">+</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-  <div class="jumbotron" id="graph">
-  <div class="container">
-    <div class="chart">
-      <linechart class="chart" data="pwrCtrl.plotData" options="pwrCtrl.plotOptions"></linechart>
-    </div>
-  </div>
-    <!--<div range-slider="range-slider" min="1000" max="10000" model-min="1000" model-max="10000">-->
-
-  <div class="panel panel-default adminPanel" ng-controller="AdminController as adminCtrl">
-    <div class="panel-heading aware-heading">Admin panel</div>
-    <div class="panel-body">
-      <button ng-click="adminCtrl.toggleSplash()" class="btn btn-default">Toggle Splash</button>
-      <hr>
-      <div class="form-group">
-        <input class="form form-control" ng-model="adminCtrl.newDataset.title">
-      </div>
-      <button ng-click="adminCtrl.saveDataset()" class="btn btn-default">Save dataset</button>
-      <hr>
-      <h5>Select dataset:</h5>
-      <select ng-model="pwrCtrl.selectedDataset" ng-change="pwrCtrl.changeDataset()" class="form-control" ng-options="dataMeta.title for dataMeta in pwrCtrl.dataMeta">
-      </select>
-      <br/>
-
-    </div>
-  </div>
-  </div>
-
-  <div class="jumbotron footer" style="display:none">
-    <div class="container">
-      <div class="row">
-        <div class="card col-sm-4">
-          <h4 class="text-center">Current Usage</h4>
-          <h3 class="text-center">{{pwrCtrl.currentUsage}}<br /><small> Watt</small></h3>
+      <div class="jumbotron" id="graph">
+        <div class="container">
+          <div class="chart">
+            <linechart class="chart" data="pwrCtrl.plotData" options="pwrCtrl.plotOptions"></linechart>
+          </div>
         </div>
+        <!--<div range-slider="range-slider" min="1000" max="10000" model-min="1000" model-max="10000">-->
 
-        <div class="card col-sm-4">
-          <h4 class="text-center">Total Usage</h4>
-          <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 | number: 3}}<br /><small> kWh</small></h3>
+        <div class="panel panel-default adminPanel" ng-controller="AdminController as adminCtrl">
+          <div class="panel-heading aware-heading">Admin panel</div>
+          <div class="panel-body">
+            <button ng-click="adminCtrl.toggleSplash()" class="btn btn-default">Toggle Splash</button>
+            <hr>
+            <div class="form-group">
+              <input class="form form-control" ng-model="adminCtrl.newDataset.title">
+            </div>
+            <button ng-click="adminCtrl.saveDataset()" class="btn btn-default">Save dataset</button>
+            <hr>
+            <h5>Select dataset:</h5>
+            <select ng-model="pwrCtrl.selectedDataset" ng-change="pwrCtrl.changeDataset()" class="form-control" ng-options="dataMeta.title for dataMeta in pwrCtrl.dataMeta">
+            </select>
+            <br/>
+
+          </div>
         </div>
+      </div>
 
-        <div class="card col-sm-4">
-          <h2>
+      <div class="jumbotron footer" style="display:none">
+        <div class="container">
+          <div class="row">
+            <div class="card col-sm-4">
+              <h4 class="text-center">Current Usage</h4>
+              <h3 class="text-center">{{pwrCtrl.currentUsage}}<br /><small> Watt</small></h3>
+            </div>
+
+            <div class="card col-sm-4">
+              <h4 class="text-center">Total Usage</h4>
+              <h3 class="text-center">{{pwrCtrl.totalUsage / 1000 | number: 3}}<br /><small> kWh</small></h3>
+            </div>
+
+            <div class="card col-sm-4">
+              <h2>
             This is how old we are:
           </h2>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
   </div>
-
-</div>
   <!--  <div class="tabs-striped tabs-background-positive tabs-light">
     <div class="tabs">
       <a class="tab-item active" href="#">
@@ -292,34 +341,39 @@
   </div>-->
 
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="https://code.ionicframework.com/1.0.0-beta.13/css/ionic.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="https://code.ionicframework.com/1.0.0-beta.13/css/ionic.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" />
 
-<!-- compiled CSS --><% styles.forEach( function ( file ) { %>
-<link rel="stylesheet" type="text/css" href="<%= file %>" /><% }); %>
+  <!-- compiled CSS -->
+  <% styles.forEach( function ( file ) { %>
+    <link rel="stylesheet" type="text/css" href="<%= file %>" />
+    <% }); %>
 
-<script type="text/javascript" charset="utf-8" src="https://code.jquery.com/jquery-2.1.1.js"></script>
-<script type="text/javascript" charset="utf-8" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.js"></script>
-<script type="text/javascript" charset="utf-8" src="https://code.angularjs.org/1.2.26/angular.js"></script>
-<script type="text/javascript" charset="utf-8" src="https://code.angularjs.org/1.2.26/angular-animate.js"></script>
-<script type="text/javascript" charset="utf-8" src="https://cdn.firebase.com/js/client/1.1.1/firebase.js"></script>
-<script type="text/javascript" charset="utf-8" src="https://cdn.firebase.com/libs/angularfire/0.8.2/angularfire.js"></script>
-<script type="text/javascript" charset="utf-8" src="https://code.ionicframework.com/1.0.0-beta.13/js/ionic.min.js"></script>
+      <script type="text/javascript" charset="utf-8" src="https://code.jquery.com/jquery-2.1.1.js"></script>
+      <script type="text/javascript" charset="utf-8" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.js"></script>
+      <script type="text/javascript" charset="utf-8" src="https://code.angularjs.org/1.2.26/angular.js"></script>
+      <script type="text/javascript" charset="utf-8" src="https://code.angularjs.org/1.2.26/angular-animate.js"></script>
+      <script type="text/javascript" charset="utf-8" src="https://cdn.firebase.com/js/client/1.1.1/firebase.js"></script>
+      <script type="text/javascript" charset="utf-8" src="https://cdn.firebase.com/libs/angularfire/0.8.2/angularfire.js"></script>
+      <script type="text/javascript" charset="utf-8" src="https://code.ionicframework.com/1.0.0-beta.13/js/ionic.min.js"></script>
 
-<!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
-<script type="text/javascript" charset="utf-8" src="<%= file %>"></script><% }); %>
+      <!-- compiled JavaScript -->
+      <% scripts.forEach( function ( file ) { %>
+        <script type="text/javascript" charset="utf-8" src="<%= file %>"></script>
+        <% }); %>
 
-<script>
-$(window).scroll(function() {
-if ($(document).scrollTop() > 50) {
-$('.logo').addClass('shrink');
-}
-else {
-$('.logo').removeClass('shrink'); }
-});
-</script>
-
+          <script>
+            $(window).scroll(function() {
+              if ($(document).scrollTop() > 50) {
+                $('.logo').addClass('shrink');
+              }
+              else {
+                $('.logo').removeClass('shrink');
+              }
+            });
+          </script>
 </body>
+
 </html>
