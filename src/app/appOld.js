@@ -1,61 +1,33 @@
 (function() {
     'use strict';
 
-    var awareApp = angular.module('awareAppOld', ['firebase', 'moras.config', 'moras.auth', 'aware.admin', 'aware.dashboard', 'n3-line-chart']);
+    var awareApp = angular.module('awareAppOld', ['firebase', 'aware.admin', 'aware.user', 'aware.dashboard', 'n3-line-chart']);
 
-    awareApp.controller('PowerController', ['$firebase', 'DataService', 'DatametaService', 'FB_URI',
-    function($firebase, DataService, DatametaService, FB_URI) {
+    awareApp.controller('PowerController', ['$firebase', 'UserService', 'DataService', 'DatametaService',
+    function($firebase, UserService, DataService, DatametaService) {
         console.log('Aware starting');
         var self = this;
 
-        this.authed = false;
+        UserService.load(function(){
+            console.log('UserServiceCallback');
+            this.device = UserService.user.device;
 
-        this.rootRef = new Firebase(FB_URI);
-        this.rootRef.onAuth(function(authData) {
-            if (authData) {
-                console.log('Auth data found. User is logged in.');
-                // HAX
-                if (this.loginForm && this.loginForm.newUser) {
-                    this.rootRef.child('users').child(authData.uid).set({
-                        email: authData.password.email
-                    }, function(error) {
-                        if (error) {
-                            console.log('Could not create user data in FB: %o', error);
-                        }
-                        else {
-                            console.log('Successfully created user data.');
-                        }
-                    });
-                }
+            DatametaService.setup(this.device);
+            this.dataMeta = DatametaService.data();
+            // Initialse data
+            this.dataMeta.$loaded().then(function() {
+                self.dataMeta.unshift({
+                    dataId: 'incoming',
+                    title: 'Live'
+                });
 
-                var deviceRef = this.rootRef.child('users').child(authData.uid).child('device');
-                deviceRef.on('value', function(snapshot) {
-                    this.device = snapshot.val();
+                self.selectedDataset = self.dataMeta[0];
+                self.changeDataset();
+                self.setPlotTime(30);
 
-                    DatametaService.setup(this.device);
-                    this.dataMeta = DatametaService.data();
-                    // Initialse data
-                    this.dataMeta.$loaded().then(function() {
-                        self.dataMeta.unshift({
-                            dataId: 'incoming',
-                            title: 'Live'
-                        });
-
-                        self.selectedDataset = self.dataMeta[0];
-                        self.changeDataset();
-                        self.setPlotTime(30);
-
-                        // Load complete, show page
-                        /*$('#splash').fadeOut();*/
-                    });
-
-                    this.authed = true;
-                }, this);
-            }
-            else {
-                console.log('Auth data not found. User is not logged in.');
-                this.authed = false;
-            }
+                // Load complete, show page
+                /*$('#splash').fadeOut();*/
+            });
         }, this);
 
         this.rawDataErrorCorrectorEnabled = true;
