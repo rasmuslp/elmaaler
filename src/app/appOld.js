@@ -9,7 +9,7 @@
         var self = this;
 
         UserService.load(function(){
-            console.log('UserServiceCallback');
+            console.log('App: User load complete');
             this.device = UserService.user.device;
 
             DatametaService.setup(this.device);

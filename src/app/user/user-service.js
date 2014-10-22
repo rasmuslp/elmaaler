@@ -10,12 +10,12 @@
                 object.user = {};
 
                 object.load = function(callback, callbackObject) {
-                    console.log('UserServiceLoad');
+                    console.log('US: Load');
 
                     AuthService.waitForAuth(function() {
                         var userRef = ref.child('users').child(AuthService.authData.uid);
                         userRef.on('value', function(snapshot) {
-                            console.log('UserServiceFetched');
+                            console.log('US: Got data');
                             object.user = snapshot.val();
                             if (callback && typeof callback === 'function') {
                                 if (callbackObject && typeof callbackObject === 'object') {
