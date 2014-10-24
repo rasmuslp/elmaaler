@@ -274,7 +274,7 @@ body {
       background-attachment: fixed;
       background-position: center;
       background-color: #6ad1e6;
-      z-index: 5;
+      z-index: 2000;
       text-align: center;
 }
 

@@ -8,8 +8,8 @@
 
                 var ret = {};
 
-                ret.setup = function(device, key) {
-                    var ref = new Firebase(FB_URI + 'device/' + device + '/' + '/data/' + key + '/raw');
+                ret.setup = function(device) {
+                    var ref = new Firebase(FB_URI + 'messagesFromDevices/' + device + '/');
                     data = $firebase(ref).$asArray();
                 };
 

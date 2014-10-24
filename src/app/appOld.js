@@ -31,7 +31,7 @@
         }, this);
 
         this.rawDataErrorCorrectorEnabled = true;
-        this.deviceIdentifierEnabled = true;
+        this.deviceIdentifierEnabled = false;
 
         this.currentPrice = 2.2;
 
@@ -119,7 +119,7 @@
             this.enableTrimOfChanges = true;
             this.enableDeviceUsageTrimmer = false;
 
-            DataService.setup(this.device, this.selectedDataset.dataId);
+            DataService.setup(this.device);
             this.data = DataService.data();
             this.data.$watch(function(event) {
                 if (event.event === 'child_added') {
