@@ -1,0 +1,33 @@
+{
+	"rules": {
+		".read": true,
+		"buckets": {
+			".read": true,
+			".write": true
+		},
+		"data": {
+			"$data_id": {
+				".read": true,
+				".write": true
+			}
+		},
+		"devices": {
+			"$device_id": {
+				".read": true,
+				".write": true
+			}
+		},
+		"messagesFromDevices": {
+			"$device_id": {
+				".read": "$device_id === root.child('users').child(auth.uid).child('device').val()",
+				".write": true
+			}
+		},
+		"users": {
+			"$user_id": {
+				".read": "$user_id === auth.uid",
+				".write": "$user_id === auth.uid"
+			}
+		}
+	}
+}
