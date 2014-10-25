@@ -1,36 +1,37 @@
-__author__ = 'rasmus'
+__author__ = 'Rasmus Ljungmann Pedersen'
 
 from firebase import Firebase
 from sseclient import SSEClient
 
-import json
-import numpy as np
 import datetime
+import json
 
-#sseClient = SSEClient('https://elmaaler.firebaseio.com/device/23436f3643fc42ee/data/incoming/raw.json')
-sseClient = SSEClient('https://elmaaler.firebaseio.com/users.json')
-for fbEvent in sseClient:
-    msgEvent = fbEvent.event
-    msgData = json.loads(fbEvent.data)
-    if msgData is None:
-        # keep-alive, ignoring for now
-        print 'Keep-alive ? ' + msgEvent
-        continue
+FB_URL = 'https://elmaaler.firebaseio.com/'
 
-    print 'Event: ' + fbEvent.event + ' data: ' + json.dumps(msgData)
+# Load information about devices
+devicesFb = Firebase(FB_URL + 'devices')
+devices = devicesFb.get()
+if devices is None:
+    print 'Devices does not exist on Firebase'
+    devices = {}
 
-
-
+# Load data model
+dataFb = Firebase(FB_URL + 'data')
+data = dataFb.get()
+if data is None:
+    print 'Data does not exist on Firebase'
+    data = {}
 
 buckets = {
     'years': {}
 }
 
-def addPointToBucket(timeStamp):
-    if timeStamp == None:
-        return
-
+def addPointToBucketForData(id, timeStamp):
     # Construct keys if non existant
+    if not 'years' in buckets:
+        #TODO: Log / fix
+        print 'Oops, buckets not initialised!'
+        return
 
     if not timeStamp.year in buckets['years']:
         buckets['years'][timeStamp.year] = {
@@ -67,28 +68,95 @@ def addPointToBucket(timeStamp):
     buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['usage'] += 1
     buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['minutes'][timeStamp.minute]['usage'] += 1
 
+def setLastTimeStampForDevice(id, timeStamp):
+    deviceFb = Firebase(FB_URL + 'devices/' + id)
+    deviceFb.patch({
+        'lastTimeStamp': timeStamp
+    })
 
+    # HAX: Overriding devices (might not be safe in the future)
+    devices = devicesFb.get()
 
+def newTimeDiffFromDevice(id, timeDiff):
+    global devices
 
+    if not id in devices:
+        #TODO: LOG
+        print 'No device with id ' + id + '. Skipping...'
+        return
 
+    if not 'lastTimeStamp' in devices[id]:
+        #TODO: LOG
+        print 'No lastTimeStamp for device with id ' + id + '. Skipping...'
+        return
 
-# Read live data
-f = Firebase('https://elmaaler.firebaseio.com/device/23436f3643fc42ee/data/incoming/raw')
-rawData = f.get()
-startTimeStamp = -1
+    initData = False
+    if not 'dataKey' in devices[id]:
+        #TODO: LOG
+        print 'No dataKey for device with id ' + id + '. Creating...'
+        dataRef = dataFb.push({
+            'dummy': True,
+            'buckets': {
+                'years': {}
+            }
+        })
+        deviceFb = Firebase(FB_URL + 'devices/' + id)
+        deviceFb.patch({
+            'dataKey': dataRef['name']
+        })
+        devices = deviceFb.get()
+        initData = True
 
-for key, dataPoint in iter(sorted(rawData.iteritems())):
-    if 'timeStamp' in dataPoint:
-        startTimeStamp = dataPoint['timeStamp']
-    elif 'timeDiff' in dataPoint:
-        # Skipping timeDiffs with no prior timeStamp
-        if startTimeStamp == -1:
-            #LOG
+    #print 'Devices: ' + json.dumps(devices)
+
+    timeStampPre = devices[id]['lastTimeStamp'] * 1000 + timeDiff
+    timeStamp = datetime.datetime.fromtimestamp(timeStampPre/1000).replace(microsecond=timeStampPre % 1000 * 1000)
+
+    #if initData:
+    #    addPointToBucketForData({}, timeStamp)
+
+    if id == '23436f3643fc42ee':
+        addPointToBucketForData(id, timeStamp)
+
+def messageFromDevice(event, id, message):
+    print 'Event: ' + event + ' id: ' + id + ' message: ' + json.dumps(message)
+
+    if 'timeStamp' in message:
+        setLastTimeStampForDevice(id, message['timeStamp'])
+    elif 'timeDiff' in message:
+        newTimeDiffFromDevice(id, message['timeDiff'])
+
+def pushDataToFB():
+    print 'Pushing data to FB...'
+    bucketFB = Firebase(FB_URL + 'buckets')
+    bucketFB.put(buckets)
+    print 'Pushing data to FB... Done'
+
+def main():
+    messagesFromDevices = SSEClient(FB_URL + 'messagesFromDevices.json')
+    for sseEvent in messagesFromDevices:
+        # Read content of event
+        event = sseEvent.event
+        payload = json.loads(sseEvent.data)
+
+        # Keep-alive, ignoring for now
+        if payload is None:
             continue
 
-        dataPointTimeStamp = startTimeStamp * 1000 + dataPoint['timeDiff']
-        lastTimeStamp = datetime.datetime.fromtimestamp(dataPointTimeStamp/1000).replace(microsecond=dataPointTimeStamp % 1000 * 1000)
-        addPointToBucket(lastTimeStamp)
+        path = payload['path']
+        data = payload['data']
 
-print 'Buckets'
-print json.dumps(buckets, indent=2)
+        if path == '/':
+            # Data from multiple devices
+            for deviceId in data.keys():
+                deviceMessages = data[deviceId]
+                for key, message in iter(sorted(deviceMessages.iteritems())):
+                    #TODO: There must be a better way to do this that only gives the value and is sorted on key
+                    messageFromDevice(event, deviceId, message)
+            pushDataToFB()
+        else:
+            # Assuming single message
+            messageFromDevice(event, path.split('/')[1], data)
+            pushDataToFB()
+
+main()
