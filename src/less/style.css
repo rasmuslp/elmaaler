@@ -42,7 +42,7 @@ body {
 .logo {
     transition: all 0.4s ease;
     width: 100px;
-		padding-top: 50px;
+	padding-top: 50px;
 }
 
 .logo.shrink{
@@ -430,20 +430,21 @@ body {
 	transition: all 0.4s ease;
 }
 
-.currentUsageChange.negative{
-	color: #ef7b7b;
+.currentUsageChange.usageFalling{
+	color: #9fef7b;
 }
 
-.currentUsageChange.negative:before{
+.currentUsageChange.usageFalling:before{
+
+}
+
+.currentUsageChange.usageRising:before{
 	content: "+";
 }
 
-.currentUsageChange.posetive:before{
-}
 
-
-.currentUsageChange.posetive{
-	color: #9fef7b;
+.currentUsageChange.usageRising{
+	color: #ef7b7b;
 }
 
 .ledIndicator .turnedOn {

@@ -3,8 +3,8 @@
 
     var awareApp = angular.module('awareAppOld', ['firebase', 'aware.admin', 'aware.user', 'aware.dashboard', 'n3-line-chart']);
 
-    awareApp.controller('PowerController', ['$firebase', 'UserService', 'DataService', 'DatametaService',
-    function($firebase, UserService, DataService, DatametaService) {
+    awareApp.controller('PowerController', ['$firebase', 'UserService', 'DataService', 'DevicesService', 'MessagesService',
+    function($firebase, UserService, DataService, DevicesService, MessagesService) {
         console.log('Aware starting');
         var self = this;
 
@@ -12,22 +12,14 @@
             console.log('App: User load complete');
             this.device = UserService.user.device;
 
-            DatametaService.setup(this.device);
-            this.dataMeta = DatametaService.data();
-            // Initialse data
-            this.dataMeta.$loaded().then(function() {
-                self.dataMeta.unshift({
-                    dataId: 'incoming',
-                    title: 'Live'
-                });
+            self.dataMeta = [{
+                dataId: 'incoming',
+                title: 'Live'
+            }];
 
-                self.selectedDataset = self.dataMeta[0];
-                self.changeDataset();
-                self.setPlotTime(30);
-
-                // Load complete, show page
-                /*$('#splash').fadeOut();*/
-            });
+            self.selectedDataset = self.dataMeta[0];
+            self.changeDataset();
+            self.setPlotTime(30);
         }, this);
 
         this.rawDataErrorCorrectorEnabled = true;
@@ -40,7 +32,7 @@
                 x: {
                     type: 'date',
                     labelFunction: function(value) {
-                        return value + ' s';
+                        return value;
                     }
                 },
                 y: {
@@ -79,6 +71,42 @@
             columnsHGap: 5
         };
 
+        this.barPlotOptions = {
+            axes: {
+                x: {
+                    type: 'date',
+                    labelFunction: function(value) {
+                        return value;
+                    }
+                },
+                y: {
+                    min: 0,
+                    labelFunction: function(value) {
+                        return value + ' Wh';
+                    }
+                }
+            },
+            series: [{
+                y: 'usage',
+                axis: 'y',
+                color: '#6ad1e6',
+                type: 'column',
+                striped: true,
+                label: 'Wh'
+            }],
+            lineMode: 'linear',
+            tension: 0.7,
+            tooltip: {
+                mode: 'scrubber',
+                formatter: function(x, y, series) {
+                    return y + ' ' + series.label + ' at ' + x + ' minutes';
+                }
+            },
+            drawLegend: true,
+            drawDots: true,
+            columnsHGap: 1
+        };
+
         this.setPlotTime = function(minutes) {
             minutes = parseInt(minutes || 0, 10);
             var oldMinutes = this.plotMinutes || 0;
@@ -97,8 +125,8 @@
         };
 
         this.changeDataset = function() {
-            if (typeof this.data !== 'undefined') {
-                DataService.destroy();
+            if (typeof this.messages !== 'undefined') {
+                MessagesService.destroy();
             }
 
             this.currentUsage = 'Collecting data...';
@@ -119,9 +147,36 @@
             this.enableTrimOfChanges = true;
             this.enableDeviceUsageTrimmer = false;
 
-            DataService.setup(this.device);
-            this.data = DataService.data();
-            this.data.$watch(function(event) {
+
+            // DevicesService.setup(this.device);
+            // this.imp = DevicesService.get();
+            // this.imp.$loaded().then(function() {
+            //   DataService.setup(self.imp.dataKey);
+            //   self.data = DataService.get();
+            //   self.data.$watch(function(event){
+            //       console.log('Data !! %o', self.data);
+            //       if (event.event === 'child_added') {
+            //           console.log(self.data.$getRecord(event.key));
+            //       }
+            //   });
+            // });
+            var hax1 = new Firebase('https://elmaaler.firebaseio.com/buckets/23436f3643fc42ee/');
+            var hax2 = $firebase(hax1).$asObject();
+            this.barPlotData = [];
+            hax2.$loaded().then(function() {
+                angular.forEach(hax2, function(value) {
+                    var date = new Date(value.date.time*1000);
+                    date.setSeconds(0);
+                    this.push({
+                        'x': date,
+                        'usage': value.usage}
+                    );
+                }, self.barPlotData);
+            });
+
+            MessagesService.setup(this.device);
+            this.messages = MessagesService.get();
+            this.messages.$watch(function(event) {
                 if (event.event === 'child_added') {
                     //jQuery('.pulse').addClass('animated bounce');
                     //$('.pulse').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', $('animated bounce').remove());
@@ -130,7 +185,7 @@
                         $(this).removeClass().addClass('img img-responsive img-center logo');
                     });
 
-                    var current = self.data.$getRecord(event.key);
+                    var current = self.messages.$getRecord(event.key);
                     if (current.hasOwnProperty('timeStamp')) {
                         // Device restarted, new series beginning.
                         self.timeStamp = current.timeStamp;
@@ -140,13 +195,13 @@
                     }
                     else if (current.hasOwnProperty('timeDiff')) {
                         // New data
-                        self.data.$getRecord(event.key).verified = false;
+                        self.messages.$getRecord(event.key).verified = false;
                         self.totalUsage++;
                         if (event.prevChild === null) {
                             // No previous point => no calculation
                             return;
                         }
-                        var prev = self.data.$getRecord(event.prevChild);
+                        var prev = self.messages.$getRecord(event.prevChild);
                         if (!prev.hasOwnProperty('timeDiff')) {
                             // No previous point => no calculation
                             return;
@@ -474,7 +529,7 @@
         };
 
         this.addDataToPlot = function(dataPoint, usage) {
-            this.currentUsageChange = this.currentUsage - usage;
+            this.currentUsageChange = usage - this.currentUsage;
             this.currentUsage = usage;
 
             var currentDeviceUsage = 0;
