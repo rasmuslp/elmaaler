@@ -54,7 +54,7 @@
                             console.log('AS: Waiting for auth... still not authed.');
                             $timeout(function() {
                                 object.waitForAuth(callback, callbackObject);
-                            }, 100);
+                            }, 250);
                         }
                     }
                 };
