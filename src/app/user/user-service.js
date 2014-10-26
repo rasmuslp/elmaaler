@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('aware.user.service', ['moras.auth'])
-        .factory('UserService', ['AuthService', 'FB_URI', '$firebase',
+        .factory('UserService', ['AuthService', 'FB_URI',
             function(AuthService, FB_URI) {
                 var ref = new Firebase(FB_URI);
                 var object = {};

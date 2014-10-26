@@ -3,7 +3,7 @@
 
     angular.module('moras.auth.service', ['moras.config', 'firebase'])
         .factory('AuthService', ['FB_URI', '$firebase', '$timeout',
-            function(FB_URI, $timeout) {
+            function(FB_URI, $firebase, $timeout) {
                 var ref = new Firebase(FB_URI);
 
                 var object = {};
@@ -51,6 +51,7 @@
                             }
                         }
                         else {
+                            console.log('AS: Waiting for auth... still not authed.');
                             $timeout(function() {
                                 object.waitForAuth(callback, callbackObject);
                             }, 100);
