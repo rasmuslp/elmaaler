@@ -6,131 +6,146 @@ from sseclient import SSEClient
 import datetime
 import json
 
-FB_URL = 'https://elmaaler.firebaseio.com/'
+LOADTEST = False
 
-# Load information about devices
-devicesFb = Firebase(FB_URL + 'devices')
-devices = devicesFb.get()
-if devices is None:
-    print 'Devices does not exist on Firebase'
-    devices = {}
+devices = {}
+data = {}
 
-# Load data model
-dataFb = Firebase(FB_URL + 'data')
-data = dataFb.get()
-if data is None:
-    print 'Data does not exist on Firebase'
-    data = {}
+if not LOADTEST:
+    FB_URL = 'https://elmaaler.firebaseio.com/'
 
-buckets = {
-    'years': {}
-}
+    # Load information about devices
+    devicesFb = Firebase(FB_URL + 'devices')
+    devices = devicesFb.get()
+    if devices is None:
+        print 'Devices does not exist on Firebase'
+        devices = {}
 
-def addPointToBucketForData(id, timeStamp):
+    # Load data model
+    dataFb = Firebase(FB_URL + 'data')
+    data = dataFb.get()
+    if data is None:
+        print 'Data does not exist on Firebase'
+        data = {}
+
+def addPointToHistoryForData(dataKey, timeStamp):
     # Construct keys if non existant
-    if not 'years' in buckets:
-        #TODO: Log / fix
-        print 'Oops, buckets not initialised!'
-        return
+    if not dataKey in data:
+        data[dataKey] = {}
 
-    if not timeStamp.year in buckets['years']:
-        buckets['years'][timeStamp.year] = {
+    if not 'history' in data[dataKey]:
+        data[dataKey]['history'] = {
+            'years': {}
+        }
+
+    if not timeStamp.year in data[dataKey]['history']['years']:
+        data[dataKey]['history']['years'][timeStamp.year] = {
             'usage': 0.0,
             'months': {}
         }
 
-    if not timeStamp.month in buckets['years'][timeStamp.year]['months']:
-        buckets['years'][timeStamp.year]['months'][timeStamp.month] = {
+    if not timeStamp.month in data[dataKey]['history']['years'][timeStamp.year]['months']:
+        data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month] = {
             'usage': 0.0,
             'days': {}
         }
 
-    if not timeStamp.day in buckets['years'][timeStamp.year]['months'][timeStamp.month]['days']:
-        buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day] = {
+    if not timeStamp.day in data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days']:
+        data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day] = {
             'usage': 0.0,
             'hours': {}
         }
 
-    if not timeStamp.hour in buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours']:
-        buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour] = {
+    if not timeStamp.hour in data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours']:
+        data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour] = {
             'usage': 0.0,
             'minutes': {}
         }
 
-    if not timeStamp.minute in buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['minutes']:
-        buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['minutes'][timeStamp.minute] = {
+    if not timeStamp.minute in data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['minutes']:
+        data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['minutes'][timeStamp.minute] = {
             'usage': 0.0
         }
 
-    buckets['years'][timeStamp.year]['usage'] += 1
-    buckets['years'][timeStamp.year]['months'][timeStamp.month]['usage'] += 1
-    buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['usage'] += 1
-    buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['usage'] += 1
-    buckets['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['minutes'][timeStamp.minute]['usage'] += 1
+    data[dataKey]['history']['years'][timeStamp.year]['usage'] += 1
+    data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['usage'] += 1
+    data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['usage'] += 1
+    data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['usage'] += 1
+    data[dataKey]['history']['years'][timeStamp.year]['months'][timeStamp.month]['days'][timeStamp.day]['hours'][timeStamp.hour]['minutes'][timeStamp.minute]['usage'] += 1
 
-def setLastTimeStampForDevice(id, timeStamp):
-    deviceFb = Firebase(FB_URL + 'devices/' + id)
-    deviceFb.patch({
-        'lastTimeStamp': timeStamp
-    })
-
-    # HAX: Overriding devices (might not be safe in the future)
-    devices = devicesFb.get()
-
-def newTimeDiffFromDevice(id, timeDiff):
+def setLastTimeStampForDevice(deviceId, timeStamp):
     global devices
 
-    if not id in devices:
+    if LOADTEST:
+        devices[deviceId] = {}
+        devices[deviceId]['lastTimeStamp'] = timeStamp
+    else:
+        devicesFb.child(deviceId).patch({
+            'lastTimeStamp': timeStamp
+        })
+
+        # HAX: Overriding devices (might not be safe in the future)
+        devices = devicesFb.get()
+
+def newTimeDiffFromDevice(deviceId, timeDiff):
+    global devices
+
+    if not deviceId in devices:
         #TODO: LOG
-        print 'No device with id ' + id + '. Skipping...'
+        print 'No device with id ' + deviceId + '. Skipping...'
         return
 
-    if not 'lastTimeStamp' in devices[id]:
+    if not 'lastTimeStamp' in devices[deviceId]:
         #TODO: LOG
-        print 'No lastTimeStamp for device with id ' + id + '. Skipping...'
+        print 'No lastTimeStamp for device with id ' + deviceId + '. Skipping...'
         return
 
     initData = False
-    if not 'dataKey' in devices[id]:
+    if not 'dataKey' in devices[deviceId]:
         #TODO: LOG
-        print 'No dataKey for device with id ' + id + '. Creating...'
-        dataRef = dataFb.push({
-            'dummy': True,
-            'buckets': {
-                'years': {}
-            }
-        })
-        deviceFb = Firebase(FB_URL + 'devices/' + id)
-        deviceFb.patch({
-            'dataKey': dataRef['name']
-        })
-        devices = deviceFb.get()
         initData = True
+        print 'No dataKey for device with id ' + deviceId + '. Creating...'
 
-    #print 'Devices: ' + json.dumps(devices)
+        if LOADTEST:
+            dataKey = len(data)
+            data[dataKey] = {}
+            devices[deviceId]['dataKey'] = dataKey
+        else:
+            dataRef = dataFb.push({
+                'dummy': True
+            })
+            devicesFb.child(deviceId).patch({
+                'dataKey': dataRef['name']
+            })
+            devices = devicesFb.get()
 
-    timeStampPre = devices[id]['lastTimeStamp'] * 1000 + timeDiff
+    timeStampPre = devices[deviceId]['lastTimeStamp'] * 1000 + timeDiff
     timeStamp = datetime.datetime.fromtimestamp(timeStampPre/1000).replace(microsecond=timeStampPre % 1000 * 1000)
 
-    #if initData:
-    #    addPointToBucketForData({}, timeStamp)
+    dataKey = devices[deviceId]['dataKey']
+    addPointToHistoryForData(dataKey, timeStamp)
 
-    if id == '23436f3643fc42ee':
-        addPointToBucketForData(id, timeStamp)
+    if initData:
+        pushDataToFB(deviceId)
+        #dataFb.child(dataKey).child('dummy').delete()
 
-def messageFromDevice(event, id, message):
-    print 'Event: ' + event + ' id: ' + id + ' message: ' + json.dumps(message)
+def messageFromDevice(event, deviceId, message):
+    print 'Event: ' + event + ' id: ' + deviceId + ' message: ' + json.dumps(message)
 
     if 'timeStamp' in message:
-        setLastTimeStampForDevice(id, message['timeStamp'])
+        setLastTimeStampForDevice(deviceId, message['timeStamp'])
     elif 'timeDiff' in message:
-        newTimeDiffFromDevice(id, message['timeDiff'])
+        newTimeDiffFromDevice(deviceId, message['timeDiff'])
 
-def pushDataToFB():
-    print 'Pushing data to FB...'
-    bucketFB = Firebase(FB_URL + 'buckets')
-    bucketFB.put(buckets)
-    print 'Pushing data to FB... Done'
+def pushDataToFB(deviceId):
+    if LOADTEST:
+        print 'Not pushing to FB'
+        return
+    else:
+        print 'Pushing data to FB...'
+        dataKey = devices[deviceId]['dataKey']
+        dataFb.child(dataKey).put(data[dataKey])
+        print 'Pushing data to FB... Done'
 
 def main():
     messagesFromDevices = SSEClient(FB_URL + 'messagesFromDevices.json')
@@ -153,10 +168,25 @@ def main():
                 for key, message in iter(sorted(deviceMessages.iteritems())):
                     #TODO: There must be a better way to do this that only gives the value and is sorted on key
                     messageFromDevice(event, deviceId, message)
-            pushDataToFB()
+                pushDataToFB(deviceId)
         else:
             # Assuming single message
-            messageFromDevice(event, path.split('/')[1], data)
-            pushDataToFB()
+            deviceId = path.split('/')[1]
+            messageFromDevice(event, deviceId, data)
+            pushDataToFB(deviceId)
 
-main()
+if LOADTEST:
+    jsonFile = open('test-data.json')
+    jsonData = json.load(jsonFile)
+
+    for deviceId in jsonData['messagesFromDevices']:
+        for messageKey in jsonData['messagesFromDevices'][deviceId]:
+            message = jsonData['messagesFromDevices'][deviceId][messageKey]
+            messageFromDevice('Loaded message', deviceId, message)
+
+    print 'Devices:'
+    print devices
+    print 'Data:'
+    print data
+else:
+    main()
