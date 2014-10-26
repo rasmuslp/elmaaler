@@ -21,10 +21,8 @@
                 };
 
                 object.load = function (callbackFn, callbackObj) {
-                    console.log('US: Load');
                     var userRef = ref.child('users').child(AuthService.getAuth().data.uid);
                     userRef.on('value', function (snapshot) {
-                        console.log('US: Got data');
                         object.user = snapshot.val();
                         doCallback(callbackFn, callbackObj);
                     });

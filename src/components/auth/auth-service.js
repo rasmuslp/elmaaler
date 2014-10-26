@@ -4,8 +4,6 @@
     angular.module('moras.auth.service', ['moras.config', 'firebase'])
         .factory('AuthService', ['FB_URI',
             function (FB_URI) {
-                console.log('AS: Starting');
-
                 var ref = new Firebase(FB_URI);
 
                 var auth = {
@@ -105,8 +103,6 @@
                 object.logout = function () {
                     console.log('AS: Logging out. See you soon!');
                     ref.unauth();
-                    auth.authed = false;
-                    auth.authData = {};
                 };
 
                 return object;

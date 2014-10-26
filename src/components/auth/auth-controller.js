@@ -4,8 +4,6 @@
     angular.module('moras.auth.controller', ['moras.auth.service'])
         .controller('AuthController', ['AuthService',
             function (AuthService) {
-                console.log('AC: Starting');
-
                 this.authError = false;
 
                 this.isAuthenticated = AuthService.isAuthenticated;

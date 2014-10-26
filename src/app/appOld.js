@@ -5,7 +5,6 @@
 
     awareApp.controller('PowerController', ['$firebase', 'UserService', 'DataService', 'DevicesService', 'MessagesService',
     function($firebase, UserService, DataService, DevicesService, MessagesService) {
-        console.log('Aware starting');
         var self = this;
 
         this.rawDataErrorCorrectorEnabled = true;
@@ -576,7 +575,6 @@
         };
 
         UserService.load(function(){
-            console.log('App: User load complete');
             this.device = UserService.user.device;
 
             self.dataMeta = [{
