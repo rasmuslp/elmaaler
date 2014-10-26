@@ -1,16 +1,29 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('moras.auth.service', ['moras.config', 'firebase'])
-        .factory('AuthService', ['FB_URI', '$firebase', '$timeout',
-            function(FB_URI, $firebase, $timeout) {
+        .factory('AuthService', ['FB_URI',
+            function (FB_URI) {
+                console.log('AS: Starting');
+
                 var ref = new Firebase(FB_URI);
 
-                var object = {};
-                object.authed = false;
-                object.authData = {};
+                var auth = {
+                    authed: false,
+                    data: {}
+                };
 
-                ref.onAuth(function(authData) {
+                var object = {};
+
+                object.isAuthenticated = function () {
+                    return auth.authed;
+                };
+
+                object.getAuth = function () {
+                    return angular.copy(auth);
+                };
+
+                ref.onAuth(function (authData) {
                     if (authData) {
                         console.log('AS: Auth data found. User is logged in.');
 
@@ -28,88 +41,72 @@
                         //     });
                         // }
 
-                        object.authed = true;
-                        object.authData = authData;
-                    }
-                    else {
+                        auth.authed = true;
+                        auth.data = authData;
+                    } else {
                         console.log('AS: Auth data not found. User is not logged in.');
-                        object.authed = false;
-                        object.authData = {};
+                        auth.authed = false;
+                        auth.data = {};
                     }
                 });
 
-                object.waitForAuth = function(callback, callbackObject) {
-                    console.log('AS: Waiting for auth...');
-                    if (callback && typeof callback === 'function') {
-                        if (object.authed) {
-                            console.log('AS: Waiting for auth... done. Calling back.');
-                            if (callbackObject && typeof callbackObject === 'object') {
-                                callback.apply(callbackObject);
-                            }
-                            else {
-                                callback();
-                            }
-                        }
-                        else {
-                            console.log('AS: Waiting for auth... still not authed.');
-                            $timeout(function() {
-                                object.waitForAuth(callback, callbackObject);
-                            }, 250);
+                var doCallback = function (callbackFn, callbackObj) {
+                    if (callbackFn && typeof callbackFn === 'function') {
+                        if (callbackObj && typeof callbackObj === 'object') {
+                            callbackFn.apply(callbackObj);
+                        } else {
+                            callbackFn();
                         }
                     }
                 };
 
-                object.createUser = function(credentials) {
+                object.createUser = function (credentials) {
                     console.log('AS: Creating user with: %o', credentials);
                     ref.createUser({
                         email: credentials.email,
                         password: credentials.password
-                    }, function(error) {
+                    }, function (error) {
                         if (error) {
                             switch (error.code) {
-                                case 'EMAIL_TAKEN':
-                                    console.log('AS: Error creating user. Email taken: ' + credentials.email);
-                                    break;
-                                case 'INVALID_EMAIL':
-                                    console.log('AS: Error creating user. Invalid email: ' + credentials.email);
-                                    break;
-                                default:
-                                    console.log('AS: Error creating user. Unknown error: %o', error);
+                            case 'EMAIL_TAKEN':
+                                console.log('AS: Error creating user. Email taken: ' + credentials.email);
+                                break;
+                            case 'INVALID_EMAIL':
+                                console.log('AS: Error creating user. Invalid email: ' + credentials.email);
+                                break;
+                            default:
+                                console.log('AS: Error creating user. Unknown error: %o', error);
                             }
-                        }
-                        else {
+                        } else {
                             console.log('AS: User successfully created: ' + credentials.email);
                         }
                     });
                 };
 
-                object.login = function(credentials, callback) {
+                object.login = function (credentials, callbackFn, callbackObj) {
                     console.log('AS: Loging in with: %o', credentials);
                     ref.authWithPassword({
                         email: credentials.email,
                         password: credentials.password
-                    }, function(error, authData) {
+                    }, function (error, authData) {
                         if (error) {
                             console.log('AS: Error logging in. Unknown error: %o', error);
-                        }
-                        else {
+                        } else {
                             console.log('AS: User successfully logged in: %o', authData);
-                            object.authed = true;
-                            object.authData = authData;
+                            auth.authed = true;
+                            auth.authData = authData;
                         }
-                        if (callback && typeof(callback) === 'function') {
-                            callback(error);
-                        }
+                        doCallback(callbackFn, callbackObj);
                     }, {
                         remember: false
                     });
                 };
 
-                object.logout = function() {
+                object.logout = function () {
                     console.log('AS: Logging out. See you soon!');
                     ref.unauth();
-                    object.authed = false;
-                    object.authData = {};
+                    auth.authed = false;
+                    auth.authData = {};
                 };
 
                 return object;

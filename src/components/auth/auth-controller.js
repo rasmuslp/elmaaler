@@ -1,33 +1,32 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('moras.auth.controller', ['moras.auth.service'])
         .controller('AuthController', ['AuthService',
-            function(AuthService) {
+            function (AuthService) {
+                console.log('AC: Starting');
+
                 this.authError = false;
 
-                this.authed = function() {
-                    return AuthService.authed;
-                };
+                this.isAuthenticated = AuthService.isAuthenticated;
 
-                this.createUser = function() {
+                this.createUser = function () {
                     AuthService.createUser(this.credentials);
                     this.credentials = {};
                 };
 
-                this.login = function() {
-                    var self = this;
-                    AuthService.login(angular.copy(this.credentials), function(error) {
+                this.login = function () {
+                    AuthService.login(angular.copy(this.credentials), function (error) {
                         if (!error) {
-                            self.credentials = {};
-                            self.authError = false;
+                            this.credentials = {};
+                            this.authError = false;
                         } else {
-                            self.authError = error.message;
+                            this.authError = error.message;
                         }
-                    });
+                    }, this);
                 };
 
-                this.logout = function() {
+                this.logout = function () {
                     AuthService.logout();
                 };
             }

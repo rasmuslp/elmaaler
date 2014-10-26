@@ -1,32 +1,33 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('aware.user.service', ['moras.auth'])
         .factory('UserService', ['AuthService', 'FB_URI',
-            function(AuthService, FB_URI) {
+            function (AuthService, FB_URI) {
                 var ref = new Firebase(FB_URI);
-                var object = {};
 
-                object.user = {};
+                var object = {
+                    user: {}
+                };
 
-                object.load = function(callback, callbackObject) {
+                var doCallback = function (callbackFn, callbackObj) {
+                    if (callbackFn && typeof callbackFn === 'function') {
+                        if (callbackObj && typeof callbackObj === 'object') {
+                            callbackFn.apply(callbackObj);
+                        } else {
+                            callbackFn();
+                        }
+                    }
+                };
+
+                object.load = function (callbackFn, callbackObj) {
                     console.log('US: Load');
-
-                    AuthService.waitForAuth(function() {
-                        var userRef = ref.child('users').child(AuthService.authData.uid);
-                        userRef.on('value', function(snapshot) {
-                            console.log('US: Got data');
-                            object.user = snapshot.val();
-                            if (callback && typeof callback === 'function') {
-                                if (callbackObject && typeof callbackObject === 'object') {
-                                    callback.apply(callbackObject);
-                                }
-                                else {
-                                    callback();
-                                }
-                            }
-                        });
-                    }, this);
+                    var userRef = ref.child('users').child(AuthService.getAuth().data.uid);
+                    userRef.on('value', function (snapshot) {
+                        console.log('US: Got data');
+                        object.user = snapshot.val();
+                        doCallback(callbackFn, callbackObj);
+                    });
                 };
 
                 return object;

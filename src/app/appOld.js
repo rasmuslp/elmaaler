@@ -8,20 +8,6 @@
         console.log('Aware starting');
         var self = this;
 
-        UserService.load(function(){
-            console.log('App: User load complete');
-            this.device = UserService.user.device;
-
-            self.dataMeta = [{
-                dataId: 'incoming',
-                title: 'Live'
-            }];
-
-            self.selectedDataset = self.dataMeta[0];
-            self.changeDataset();
-            self.setPlotTime(30);
-        }, this);
-
         this.rawDataErrorCorrectorEnabled = true;
         this.deviceIdentifierEnabled = false;
 
@@ -588,6 +574,20 @@
             }
             return count;
         };
+
+        UserService.load(function(){
+            console.log('App: User load complete');
+            this.device = UserService.user.device;
+
+            self.dataMeta = [{
+                dataId: 'incoming',
+                title: 'Live'
+            }];
+
+            self.selectedDataset = self.dataMeta[0];
+            self.changeDataset();
+            self.setPlotTime(30);
+        }, this);
 
     }
     ]);

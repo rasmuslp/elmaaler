@@ -31,7 +31,7 @@
 <body ng-controller="AuthController as authCtrl">
   <div id="splash" class="jumbotron" ng-cloak></div>
 
-  <div id="signin" class="jumbotron" ng-cloak ng-show="!authCtrl.authed()">
+  <div id="signin" class="jumbotron" ng-cloak ng-show="!authCtrl.isAuthenticated()">
     <div class="container mainSplash">
       <div class="col-md-2"></div>
 
@@ -50,9 +50,9 @@
             <input id="loginPassword" type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Password">
           </div>
           <p class="bg-danger" ng-show="authCtrl.authError">{{authCtrl.authError}}</p>
-          <button ng-show="!authCtrl.authed()" type="submit" class="btn btn-login" ng-cloak ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
+          <button ng-show="!authCtrl.isAuthenticated()" type="submit" class="btn btn-login" ng-cloak ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
           </button>
-          <button ng-show="authCtrl.authed()" type="" class="btn bnt-login" ng-cloak ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
+          <button ng-show="authCtrl.isAuthenticated()" type="" class="btn bnt-login" ng-cloak ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
           </button>
         </form>
       </div>
@@ -82,17 +82,17 @@
             <label for="loginPassword2">Re-type password</label>
             <input id="loginPassword2" type="password" class="form-control" ng-model="authCtrl.credentials.password" placeholder="Re-type Password">
           </div>
-          <!--<button ng-show="authCtrl.authed()" type="" class="btn btn-login" ng-cloak ng-click="authCtrl.createUser(); authCtrl.credentials.newUser = !authCtrl.credentials.newUser;"><span class="glyphicon glyphicon-log-out"> Create User</span>-->
+          <!--<button ng-show="authCtrl.isAuthenticated()" type="" class="btn btn-login" ng-cloak ng-click="authCtrl.createUser(); authCtrl.credentials.newUser = !authCtrl.credentials.newUser;"><span class="glyphicon glyphicon-log-out"> Create User</span>-->
           </button>
-          <button ng-show="!authCtrl.authed()" type="submit" class="btn btn-login" ng-cloak ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
-            <button ng-show="authCtrl.authed()" type="" class="btn bnt-login" ng-cloak ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
+          <button ng-show="!authCtrl.isAuthenticated()" type="submit" class="btn btn-login" ng-cloak ng-click="authCtrl.login()"><span class="glyphicon glyphicon-log-in"> Login</span>
+            <button ng-show="authCtrl.isAuthenticated()" type="" class="btn bnt-login" ng-cloak ng-click="authCtrl.logout()"><span class="glyphicon glyphicon-log-out"> Logout</span>
             </button>
         </form>
       </div>
     </div>
   </div>
 
-  <div ng-cloak ng-show="authCtrl.authed()" ng-controller="PowerController as pwrCtrl">
+  <div ng-cloak ng-if="authCtrl.isAuthenticated()" ng-controller="PowerController as pwrCtrl">
 
     <div class="mainsite">
       <div class="jumbotron logoTron">
@@ -159,7 +159,7 @@
             <div class="widget widget-rect" ng-class="{active: device.active}">
               <div class="widget-heading">
 
-                <h5>{{device.title}} <button ng-hide="true" ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart btn-sm" ng-show="authCtrl.authed()"><span class="glyphicon glyphicon-trash"></span></button></h5>
+                <h5>{{device.title}} <button ng-hide="true" ng-click="pwrCtrl.removeDevice(key)" class="btn btn-chart btn-sm" ng-show="authCtrl.isAuthenticated()"><span class="glyphicon glyphicon-trash"></span></button></h5>
               </div>
               <div class="widget-body">
                 <h2>{{device.usage}} W</h2>
