@@ -1,5 +1,5 @@
 {
   "firebase": "elmaaler",
-  "public": "build",
+  "public": "src",
   "rules": "firebase-rules.json"
 }

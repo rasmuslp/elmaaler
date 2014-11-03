@@ -1,6 +1,7 @@
 {
 	"rules": {
 		".read": true,
+		".write": true,
 		"buckets": {
 			".read": true,
 			".write": true
@@ -17,10 +18,11 @@
 				".write": true
 			}
 		},
-		"messagesFromDevices": {
+		"messagesFromBlinkies": {
 			"$device_id": {
 				".read": "$device_id === root.child('users').child(auth.uid).child('device').val()",
-				".write": true
+				".write": true,
+				".indexOn": "tsFull"
 			}
 		},
 		"users": {

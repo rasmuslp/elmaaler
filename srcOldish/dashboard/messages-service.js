@@ -9,7 +9,7 @@
                 var ret = {};
 
                 ret.setup = function(key) {
-                    var ref = new Firebase(FB_URI + 'messagesFromDevices/' + key + '/');
+                    var ref = new Firebase(FB_URI + 'messagesFromBlinkies/' + key + '/');
                     data = $firebase(ref).$asArray();
                 };
 

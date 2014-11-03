@@ -3,9 +3,28 @@
 
     var awareApp = angular.module('awareAppOld', ['firebase', 'aware.admin', 'aware.user', 'aware.dashboard', 'n3-line-chart']);
 
-    awareApp.controller('PowerController', ['$firebase', 'UserService', 'DataService', 'DevicesService', 'MessagesService',
-    function($firebase, UserService, DataService, DevicesService, MessagesService) {
+    awareApp.controller('PowerController', ['$firebase', 'UserService', 'DataService', 'DevicesService', 'MessagesService', '$scope',
+    function($firebase, UserService, DataService, DevicesService, MessagesService, $scope) {
         var self = this;
+        console.log('See me and something is wrong.');
+
+        var ref = new Firebase('https://elmaaler.firebaseio.com');
+
+        ref.onAuth(function(authData) {
+            if (authData) {
+                // user authenticated with Firebase
+                console.log('TEEEEST');
+                console.log('TEEEEST2');
+                console.log(authData);
+                console.log(ref.child('users').child(authData.uid));
+                $scope.user = authData;
+
+                //console.log('User ID: ' + authData.uid + ', Provider: ' + authData.provider);
+            } else {
+                console.log('ELSE');
+                // user is logged out
+            }
+        });
 
         this.rawDataErrorCorrectorEnabled = true;
         this.deviceIdentifierEnabled = false;
@@ -83,6 +102,7 @@
             tension: 0.7,
             tooltip: {
                 mode: 'scrubber',
+
                 formatter: function(x, y, series) {
                     return y + ' ' + series.label + ' at ' + x + ' minutes';
                 }
@@ -171,14 +191,15 @@
                     });
 
                     var current = self.messages.$getRecord(event.key);
-                    if (current.hasOwnProperty('timeStamp')) {
+                    console.log(current);
+                    if (current.hasOwnProperty('ts')) {
                         // Device restarted, new series beginning.
-                        self.timeStamp = current.timeStamp;
+                        self.timeStamp = current.ts;
 
                         //TODO: Any resets ?
                         return;
                     }
-                    else if (current.hasOwnProperty('timeDiff')) {
+                    else if (current.hasOwnProperty('td')) {
                         // New data
                         self.messages.$getRecord(event.key).verified = false;
                         self.totalUsage++;
@@ -187,7 +208,7 @@
                             return;
                         }
                         var prev = self.messages.$getRecord(event.prevChild);
-                        if (!prev.hasOwnProperty('timeDiff')) {
+                        if (!prev.hasOwnProperty('td')) {
                             // No previous point => no calculation
                             return;
                         }
@@ -214,7 +235,7 @@
         };
 
         this.calculateUsage = function(prev, current) {
-            var time = prev.timeDiff - current.timeDiff;
+            var time = prev.td - current.td;
             time = time / 1000.0;
             return Math.round(3600 / time);
         };
@@ -510,7 +531,7 @@
         };
 
         this.calculateDataPointDate = function(dataPoint) {
-            return new Date(this.timeStamp * 1000 + dataPoint.timeDiff);
+            return new Date(this.timeStamp * 1000 + dataPoint.td);
         };
 
         this.addDataToPlot = function(dataPoint, usage) {
