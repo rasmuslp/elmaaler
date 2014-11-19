@@ -155,7 +155,7 @@
 				this.periodUsage = 0;
 
 				// https://www.firebase.com/docs/beta/queries/web.html
-				self.data = $firebase(ref.child('messagesFromBlinkies').child($scope.user.blinky).orderBy('tsFull').startAt(backInTime)).$asArray();
+				self.data = $firebase(ref.child('messagesFromBlinkies').child($scope.user.blinky).orderByChild('tsFull').startAt(backInTime)).$asArray();
 
 				self.data.$loaded(function () {
 					console.log('Data:');
