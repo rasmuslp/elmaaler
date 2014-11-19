@@ -20,9 +20,8 @@
 		},
 		"messagesFromBlinkies": {
 			"$device_id": {
-				".read": "$device_id === root.child('users').child(auth.uid).child('device').val()",
-				".write": true,
-				".indexOn": "tsFull"
+				".read": "$device_id === root.child('users').child(auth.uid).child('blinky').val()",
+				".write": true
 			}
 		},
 		"users": {

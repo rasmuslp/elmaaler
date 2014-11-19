@@ -13,6 +13,10 @@
 			    "235c0db930728cee": {
 			        "pulsesPerKwh": 10000,
 			        "conversion": 60
+			    },
+			    "2322b8b030728cee": {
+			        "pulsesPerKwh": 10000,
+			        "conversion": 120
 			    }
 			}
 
