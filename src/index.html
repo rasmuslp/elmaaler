@@ -47,16 +47,16 @@
     <div class="collapse navbar-collapse" id="navbar-collapse-1">
          <ul class="nav navbar-nav navbar-left">
        <li class="active"><a ui-sref="home">Home</a></li>
-            <li ng-show="user.email"><a ui-sref="dashboard">Dashboard</a></li>
+            <li ng-show="auth.password.email"><a ui-sref="dashboard">Dashboard</a></li>
             <li ng-show="awareCtrl.isAdmin()"><a ui-sref="admin">Admin</a></li>
 
      </ul>
 
 
       <ul class="nav navbar-nav navbar-right">
-        <li class="navbar-text" ng-show="user.email"><p>Welcome <b>{{user.email}}</b></p></li>
-        <li ng-show="user.email"><a href="" ng-click="awareCtrl.logout();">Logout</a></li>
-        <li ng-show="!user.email"><a ui-sref="login">Login</a></li>
+        <li class="navbar-text" ng-show="auth.password.email"><p>Welcome <b>{{auth.password.email}}</b></p></li>
+        <li ng-show="auth.password.email"><a href="" ng-click="awareCtrl.logout();">Logout</a></li>
+        <li ng-show="!auth.password.email"><a ui-sref="login">Login</a></li>
         <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
           <ul class="dropdown-menu">
@@ -117,12 +117,12 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <p class="navbar-text" ng-show="user.email">Welcome <b>{{user.email}}</b>
+              <p class="navbar-text" ng-show="auth.password.email">Welcome <b>{{auth.password.email}}</b>
               </p>
             </li>
             <li>
-              <a ng-show="user.email" href="" ng-click="awareCtrl.logout();">Logout</a>
-              <a ng-show="!user.email" ui-sref="dashboard">Login</a>
+              <a ng-show="auth.password.email" href="" ng-click="awareCtrl.logout();">Logout</a>
+              <a ng-show="!auth.password.email" ui-sref="dashboard">Login</a>
             </li>
 
           </ul>
@@ -171,10 +171,10 @@
 
   <script type="text/javascript" charset="utf-8" src="https://code.jquery.com/jquery-2.1.1.js"></script>
   <script type="text/javascript" charset="utf-8" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.js"></script>
-  <script type="text/javascript" charset="utf-8" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular.min.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular.js"></script>
   <script type="text/javascript" charset="utf-8" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular-animate.js"></script>
   <script type="text/javascript" charset="utf-8" src="https://cdn.firebase.com/js/client/2.0.4/firebase.js"></script>
-  <script type="text/javascript" charset="utf-8" src="https://cdn.firebase.com/libs/angularfire/0.9.0/angularfire.min.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://cdn.firebase.com/libs/angularfire/0.9.0/angularfire.js"></script>
 
   <script type="text/javascript" charset="utf-8" src="vendor/angular-ui-router/release/angular-ui-router.js"></script>
   <script type="text/javascript" charset="utf-8" src="vendor/d3/d3.js"></script>

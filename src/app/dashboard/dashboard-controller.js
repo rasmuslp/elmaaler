@@ -1,35 +1,36 @@
 (function () {
 	'use strict';
 
-	angular.module('dashboard-controller', []).controller('DashboardController', ['$firebase', '$scope',
-		function ($firebase, $scope) {
+	angular.module('dashboard-controller', []).controller('DashboardController', ['$firebase', '$scope', 'currentUser',
+		function ($firebase, $scope, currentUser) {
+			console.log('Dashboard controller has user: %o', currentUser);
 			var self = this;
 
 			this.factorTable = {
-			    "236947b930728cee": {
-			        "pulsesPerKwh": 10000,
-			        "conversion": 60
-			    },
-			    "235c0db930728cee": {
-			        "pulsesPerKwh": 10000,
-			        "conversion": 60
-			    },
-			    "2322b8b030728cee": {
-			        "pulsesPerKwh": 10000,
-			        "conversion": 120
-			    }
+				"236947b930728cee": {
+					"pulsesPerKwh": 10000,
+					"conversion": 60
+				},
+				"235c0db930728cee": {
+					"pulsesPerKwh": 10000,
+					"conversion": 60
+				},
+				"2322b8b030728cee": {
+					"pulsesPerKwh": 10000,
+					"conversion": 120
+				}
 			}
 
 			this.pulsesPerKwh = 1000;
-		    this.conversion = 1;
-		    if (this.factorTable.hasOwnProperty($scope.user.blinky)){
-		        if (this.factorTable[$scope.user.blinky].hasOwnProperty("pulsesPerKwh")) {
-		            this.pulsesPerKwh = this.factorTable[$scope.user.blinky]["pulsesPerKwh"];
-		        }
-		        if (this.factorTable[$scope.user.blinky].hasOwnProperty("conversion")) {
-		            this.conversion = this.factorTable[$scope.user.blinky]["conversion"];
-		        }
-		    }
+			this.conversion = 1;
+			if (this.factorTable.hasOwnProperty(currentUser.blinky)) {
+				if (this.factorTable[currentUser.blinky].hasOwnProperty("pulsesPerKwh")) {
+					this.pulsesPerKwh = this.factorTable[currentUser.blinky]["pulsesPerKwh"];
+				}
+				if (this.factorTable[currentUser.blinky].hasOwnProperty("conversion")) {
+					this.conversion = this.factorTable[currentUser.blinky]["conversion"];
+				}
+			}
 
 			var ref = new Firebase('https://elmaaler.firebaseio.com');
 
@@ -135,11 +136,9 @@
 				columnsHGap: 5
 			};
 
-			$scope.user.$loaded(function () {
-				$scope.range = 0;
-			});
+			$scope.range = 0;
 
-			this.liveRange = 30*60;
+			this.liveRange = 30 * 60;
 
 			$scope.$watch('range', function () {
 				if ($scope.range === 0) {
@@ -149,13 +148,13 @@
 				}
 			});
 
-			this.setPlotTime = function() {
+			this.setPlotTime = function () {
 				var backInTime = Date.now() / 1000 - this.liveRange;
 
 				this.periodUsage = 0;
 
 				// https://www.firebase.com/docs/beta/queries/web.html
-				self.data = $firebase(ref.child('messagesFromBlinkies').child($scope.user.blinky).orderByChild('tsFull').startAt(backInTime)).$asArray();
+				self.data = $firebase(ref.child('messagesFromBlinkies').child(currentUser.blinky).orderByChild('tsFull').startAt(backInTime)).$asArray();
 
 				self.data.$loaded(function () {
 					console.log('Data:');
@@ -171,7 +170,7 @@
 						} else {
 							if ('u' in point) {
 								if ($scope.range === 0) {
-									self.periodUsage += self.conversion * 1000.0/self.pulsesPerKwh;
+									self.periodUsage += self.conversion * 1000.0 / self.pulsesPerKwh;
 								}
 								self.currentUsage = point.u;
 								jQuery('.pulse').addClass('animated bounce');
@@ -195,7 +194,7 @@
 						this.data.shift();
 						i--;
 						if ($scope.range === 0) {
-							self.periodUsage -= self.conversion * 1000.0/self.pulsesPerKwh;
+							self.periodUsage -= self.conversion * 1000.0 / self.pulsesPerKwh;
 						}
 					} else {
 						break;
@@ -207,7 +206,7 @@
 				this.periodUsage = 0;
 
 				// https://www.firebase.com/docs/beta/queries/web.html
-				self.bucketData = $firebase(ref.child('bucketsFromBlinkies').child($scope.user.blinky).limit(count)).$asArray();
+				self.bucketData = $firebase(ref.child('bucketsFromBlinkies').child(currentUser.blinky).limit(count)).$asArray();
 
 				self.bucketData.$loaded(function () {
 					console.log('Buckets:');
@@ -222,9 +221,9 @@
 					} else if (event.event === 'child_removed') {
 						var newPeriodUsage = 0;
 
-						angular.forEach(self.bucketData, function(point) {
+						angular.forEach(self.bucketData, function (point) {
 							newPeriodUsage += point.count;
-		                });
+						});
 
 						self.periodUsage = newPeriodUsage;
 					}
@@ -268,8 +267,8 @@
 			*/
 
 			/*
-			UserService.load(function(){
-			    this.device = UserService.user.device;
+			currentUserService.load(function(){
+			    this.device = currentUserService.currentUser.device;
 
 			    self.dataMeta = [{
 			        dataId: 'incoming',

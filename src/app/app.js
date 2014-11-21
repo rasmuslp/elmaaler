@@ -8,6 +8,17 @@
         return $firebaseAuth(ref);
     }]);
 
+    awareApp.factory('User', ['$firebase', 'Auth', function ($firebase, Auth) {
+        var authData = Auth.$getAuth();
+        if (authData) {
+            var ref = new Firebase('https://elmaaler.firebaseio.com');
+            return $firebase(ref.child('users').child(authData.uid)).$asObject();
+        } else {
+            console.warn('Oh boy...');
+            return false;
+        }
+    }]);
+
     awareApp.run(['$rootScope', '$state', function ($rootScope, $state) {
         $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
             // We can catch the error thrown when the $requireAuth promise is rejected
@@ -33,6 +44,9 @@
                 resolve: {
                     'currentAuth': ['Auth', function (Auth) {
                         return Auth.$requireAuth();
+                    }],
+                    'currentUser': ['User', function (User) {
+                        return User.$loaded();
                     }]
                 }
             })
@@ -52,22 +66,22 @@
             });
     });
 
-    awareApp.controller('AwareController', ['$firebase', 'Auth', '$scope', '$state',
-        function ($firebase, Auth, $scope, $state) {
+    awareApp.controller('AwareController', ['$firebase', 'Auth', 'User', '$scope', '$state',
+        function ($firebase, Auth, User, $scope, $state) {
             var ref = new Firebase('https://elmaaler.firebaseio.com');
             $scope.auth = Auth.$getAuth();
 
             Auth.$onAuth(function (authData) {
                 if (authData) {
+                    console.log('Auth: %o', authData);
                     console.log('Logged in: ' + authData.uid);
-                    $scope.user = $firebase(ref.child('users').child(authData.uid)).$asObject();
                     $state.go('dashboard', {}, {
                         reload: true
                     });
-
                 } else {
-                    $scope.user = 'undefined';
-                    $state.go('home', {});
+                    $state.go('home', {}, {
+                        reload: true
+                    });
                     console.log('Logged out!');
                 }
             });
@@ -93,10 +107,22 @@
             };
 
             this.isAdmin = function () {
-                if ($scope.user.role === 'admin') {
-                    return true; //is admin
+                return false;
+                if (User) {
+                    User.$loaded()
+                        .then(function (data) {
+                            if (data.role === 'admin') {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })
+                        .catch(function (error) {
+                            console.error("Error:", error);
+                            return false;
+                        });
                 } else {
-                    return false; //is not admin
+                    return false;
                 }
             };
         }
