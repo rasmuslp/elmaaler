@@ -11,10 +11,11 @@
     awareApp.factory('User', ['$firebase', 'Auth', function ($firebase, Auth) {
         var authData = Auth.$getAuth();
         if (authData) {
+            console.log('Fetching user data...');
             var ref = new Firebase('https://elmaaler.firebaseio.com');
             return $firebase(ref.child('users').child(authData.uid)).$asObject();
         } else {
-            console.warn('Oh boy...');
+            console.warn('No auth, no user data...');
             return false;
         }
     }]);
@@ -43,9 +44,11 @@
                 controller: 'DashboardController as dashboardCtrl',
                 resolve: {
                     'currentAuth': ['Auth', function (Auth) {
+                        console.log('Trying to resolve auth pre dashboard');
                         return Auth.$requireAuth();
                     }],
                     'currentUser': ['User', function (User) {
+                        console.log('Trying to resolve user pre dashboard');
                         return User.$loaded();
                     }]
                 }
@@ -69,20 +72,20 @@
     awareApp.controller('AwareController', ['$firebase', 'Auth', 'User', '$scope', '$state',
         function ($firebase, Auth, User, $scope, $state) {
             var ref = new Firebase('https://elmaaler.firebaseio.com');
-            $scope.auth = Auth.$getAuth();
 
             Auth.$onAuth(function (authData) {
                 if (authData) {
-                    console.log('Auth: %o', authData);
-                    console.log('Logged in: ' + authData.uid);
+                    $scope.auth = authData;
+                    console.log('Logged in: %o', authData);
                     $state.go('dashboard', {}, {
                         reload: true
                     });
                 } else {
+                    $scope.auth = null;
+                    console.log('Logged out!');
                     $state.go('home', {}, {
                         reload: true
                     });
-                    console.log('Logged out!');
                 }
             });
 
